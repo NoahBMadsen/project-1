@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Bramble — App Map</title>
+  <style>
+    @page { size: letter landscape; margin: 0; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      background: #fff;
+      color: #1a1a1a;
+      width: 11in;
+      height: 8.5in;
+      padding: 0.35in 0.4in;
+      font-size: 10px;
+    }
+
+    /* ── HEADER ── */
+    .header {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      border-bottom: 2px solid #2d6a4f;
+      padding-bottom: 8px;
+      margin-bottom: 12px;
+    }
+    .app-name {
+      font-size: 28px;
+      font-weight: 800;
+      color: #2d6a4f;
+      letter-spacing: -0.5px;
+      line-height: 1;
+    }
+    .app-sub {
+      font-size: 11px;
+      color: #555;
+      margin-top: 3px;
+    }
+    .header-meta {
+      text-align: right;
+      font-size: 9.5px;
+      color: #888;
+      line-height: 1.6;
+    }
+    .domain-pill {
+      display: inline-block;
+      background: #f0fdf4;
+      border: 1px solid #86efac;
+      color: #166534;
+      font-size: 9.5px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 99px;
+    }
+
+    /* ── MAIN GRID ── */
+    .grid {
+      display: grid;
+      grid-template-columns: 1.6fr 1fr 1fr 1fr;
+      grid-template-rows: auto auto;
+      gap: 10px;
+      height: calc(8.5in - 1.1in);
+    }
+
+    /* ── CARDS ── */
+    .card {
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 11px 13px;
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+    .card.accent { border-color: #2d6a4f; background: #f8fdfb; }
+    .card-label {
+      font-size: 8.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: #2d6a4f;
+      border-bottom: 1px solid #e8e8e8;
+      padding-bottom: 5px;
+    }
+
+    /* ── PITCH CARD (tall left col) ── */
+    .pitch-card {
+      grid-row: 1 / 3;
+      border: 1px solid #2d6a4f;
+      background: #f8fdfb;
+      border-radius: 8px;
+      padding: 14px 15px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .pitch-tagline {
+      font-size: 13px;
+      font-weight: 600;
+      color: #1a1a1a;
+      line-height: 1.5;
+    }
+
+    /* ── FEATURES ── */
+    .feature-list { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+    .feature-item {
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+    }
+    .feature-num {
+      min-width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #2d6a4f;
+      color: #fff;
+      font-size: 8.5px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+    .feature-title { font-size: 10px; font-weight: 600; color: #1a1a1a; }
+    .feature-desc { font-size: 9.5px; color: #555; line-height: 1.4; margin-top: 1px; }
+
+    /* ── USER CARD ── */
+    .user-box {
+      background: #fff;
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+      padding: 8px 10px;
+    }
+    .user-label { font-size: 8.5px; font-weight: 700; color: #2d6a4f; margin-bottom: 3px; }
+    .user-text { font-size: 10px; color: #333; line-height: 1.5; }
+
+    /* ── TECH STACK ── */
+    .stack-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
+    .stack-item {
+      background: #f5f5f5;
+      border-radius: 5px;
+      padding: 5px 7px;
+    }
+    .stack-layer { font-size: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; color: #888; }
+    .stack-value { font-size: 9.5px; color: #1a1a1a; font-weight: 500; margin-top: 1px; }
+
+    /* ── COMPETITORS ── */
+    .comp-table { width: 100%; border-collapse: collapse; }
+    .comp-table tr { border-bottom: 1px solid #f0f0f0; }
+    .comp-table tr:last-child { border-bottom: none; }
+    .comp-table td { padding: 4px 0; font-size: 9.5px; vertical-align: top; }
+    .comp-name { font-weight: 600; color: #1a1a1a; width: 38%; }
+    .comp-gap { color: #555; line-height: 1.4; }
+    .our-edge {
+      background: #f0fdf4;
+      border: 1px solid #86efac;
+      border-radius: 5px;
+      padding: 6px 8px;
+      font-size: 9.5px;
+      color: #166534;
+      line-height: 1.4;
+    }
+    .our-edge strong { font-weight: 700; }
+
+    /* ── SCOPE ── */
+    .scope-badge {
+      display: inline-block;
+      background: #fef9c3;
+      border: 1px solid #fde68a;
+      color: #854d0e;
+      font-size: 9px;
+      font-weight: 700;
+      padding: 2px 9px;
+      border-radius: 99px;
+      letter-spacing: 0.3px;
+    }
+    .scope-text { font-size: 9.5px; color: #555; line-height: 1.5; }
+
+    /* ── MILESTONES ── */
+    .milestone-list { display: flex; flex-direction: column; gap: 5px; }
+    .milestone {
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+    }
+    .ms-marker {
+      min-width: 56px;
+      font-size: 8.5px;
+      font-weight: 700;
+      color: #2d6a4f;
+      padding-top: 1px;
+    }
+    .ms-text { font-size: 9.5px; color: #444; line-height: 1.4; }
+
+    /* ── FOOTER ── */
+    .footer {
+      position: fixed;
+      bottom: 0.2in;
+      left: 0.4in;
+      right: 0.4in;
+      display: flex;
+      justify-content: space-between;
+      font-size: 8.5px;
+      color: #bbb;
+      border-top: 1px solid #ececec;
+      padding-top: 5px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <div class="header">
+    <div>
+      <div class="app-name">Bramble</div>
+      <div class="app-sub">Foraging companion — plant browser · community map · personal journal · quiz</div>
+    </div>
+    <div class="header-meta">
+      <div><span class="domain-pill">bramblemap.com</span></div>
+      <div style="margin-top:4px;">Senior Shadow Program · Noah · May 2026</div>
+      <div>~25 hours build time &nbsp;·&nbsp; Working title — name subject to change</div>
+    </div>
+  </div>
+
+  <!-- MAIN GRID -->
+  <div class="grid">
+
+    <!-- COL 1: PITCH + FEATURES (spans 2 rows) -->
+    <div class="pitch-card">
+      <div class="card-label">The App</div>
+      <p class="pitch-tagline">A foraging companion where you identify plants, log your finds, quiz yourself on what you've learned, and discover community-pinned spots near you — all free, no paywall.</p>
+
+      <div class="user-box">
+        <div class="user-label">Target User</div>
+        <div class="user-text">Beginner and intermediate foragers — teens, young adults, and outdoors lovers — who want a personal field guide and a way to connect with their local foraging community.</div>
+      </div>
+
+      <div class="card-label" style="margin-top:2px;">Core Features</div>
+      <ul class="feature-list">
+        <li class="feature-item">
+          <div class="feature-num">1</div>
+          <div><div class="feature-title">Plant Browser</div><div class="feature-desc">Search plants with ID tips, edibility notes, and safety warnings.</div></div>
+        </li>
+        <li class="feature-item">
+          <div class="feature-num">2</div>
+          <div><div class="feature-title">Personal Journal</div><div class="feature-desc">Log finds with date, location, and notes. Grows into your own field guide.</div></div>
+        </li>
+        <li class="feature-item">
+          <div class="feature-num">3</div>
+          <div><div class="feature-title">Community Map</div><div class="feature-desc">Drop pins on foraging spots. Browse nearby finds with seasonal filters.</div></div>
+        </li>
+        <li class="feature-item">
+          <div class="feature-num">4</div>
+          <div><div class="feature-title">Plant Quiz</div><div class="feature-desc">Identify plants from descriptions or images pulled from your own log. Active learning.</div></div>
+        </li>
+        <li class="feature-item">
+          <div class="feature-num">5</div>
+          <div><div class="feature-title">My Field Guide</div><div class="feature-desc">A personal, growing collection of every plant you've encountered.</div></div>
+        </li>
+      </ul>
+    </div>
+
+    <!-- COL 2 ROW 1: TECH STACK -->
+    <div class="card">
+      <div class="card-label">Tech Stack</div>
+      <div class="stack-grid">
+        <div class="stack-item">
+          <div class="stack-layer">Frontend</div>
+          <div class="stack-value">Next.js</div>
+        </div>
+        <div class="stack-item">
+          <div class="stack-layer">Deploy</div>
+          <div class="stack-value">Vercel</div>
+        </div>
+        <div class="stack-item">
+          <div class="stack-layer">Database</div>
+          <div class="stack-value">Supabase</div>
+        </div>
+        <div class="stack-item">
+          <div class="stack-layer">Auth</div>
+          <div class="stack-value">Supabase Auth</div>
+        </div>
+        <div class="stack-item">
+          <div class="stack-layer">Map</div>
+          <div class="stack-value">Leaflet.js</div>
+        </div>
+        <div class="stack-item">
+          <div class="stack-layer">Plant Data</div>
+          <div class="stack-value">Curated JSON</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- COL 3 ROW 1: SCOPE -->
+    <div class="card">
+      <div class="card-label">Scope &amp; Timeline</div>
+      <div><span class="scope-badge">YELLOW — Shippable with focus</span></div>
+      <p class="scope-text">Plant browser and journal are doable in the first ~10 hrs. Community map adds auth + DB work but Supabase makes it manageable. Quiz can be scoped to simple multiple choice. If behind, map becomes read-only pre-seeded spots.</p>
+      <div class="milestone-list" style="margin-top:2px;">
+        <div style="font-size:8.5px;font-weight:700;color:#555;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:2px;">Rough milestones</div>
+        <div class="milestone"><span class="ms-marker">Hrs 1–5</span><span class="ms-text">Setup, plant browser, basic UI</span></div>
+        <div class="milestone"><span class="ms-marker">Hrs 6–12</span><span class="ms-text">Auth, personal journal, field guide</span></div>
+        <div class="milestone"><span class="ms-marker">Hrs 13–19</span><span class="ms-text">Community map with Leaflet + pins</span></div>
+        <div class="milestone"><span class="ms-marker">Hrs 20–23</span><span class="ms-text">Plant quiz feature</span></div>
+        <div class="milestone"><span class="ms-marker">Hrs 24–25</span><span class="ms-text">Polish, deploy to Vercel, demo</span></div>
+      </div>
+    </div>
+
+    <!-- COL 4 ROW 1: EDGE -->
+    <div class="card">
+      <div class="card-label">What Makes It Different</div>
+      <div class="our-edge">
+        <strong>Bramble's edge:</strong> The only free app purpose-built for foragers — combining a personal log, community map, quiz, and seasonal awareness in one place. No paywall, no algorithm, no noise.
+      </div>
+      <p style="font-size:9px;color:#888;margin-top:2px;">Name origin: a bramble is a wild thorny plant (blackberries, raspberries). Rugged, outdoor, immediately plant-forward.</p>
+      <div style="font-size:8.5px;font-weight:700;color:#555;text-transform:uppercase;letter-spacing:0.5px;margin-top:4px;">Domain</div>
+      <div style="font-size:10px;font-weight:600;color:#2d6a4f;">bramblemap.com &nbsp;<span style="font-size:9px;color:#888;font-weight:400;">(available)</span></div>
+    </div>
+
+    <!-- COL 2 ROW 2: COMPETITORS -->
+    <div class="card" style="grid-column: 2 / 4;">
+      <div class="card-label">Competing Apps</div>
+      <table class="comp-table">
+        <tr>
+          <td class="comp-name">PictureThis</td>
+          <td class="comp-gap">Paywall after free uses. No foraging map, no personal journal, not foraging-specific.</td>
+        </tr>
+        <tr>
+          <td class="comp-name">iNaturalist / Seek</td>
+          <td class="comp-gap">General nature app — not foraging-focused. No spot-pinning, no seasonal filter, no journal.</td>
+        </tr>
+        <tr>
+          <td class="comp-name">PlantNet</td>
+          <td class="comp-gap">ID-only. No community, no journal, no edibility/safety focus.</td>
+        </tr>
+        <tr>
+          <td class="comp-name">PlantSnap</td>
+          <td class="comp-gap">SnapMap shows species globally — not user-curated local foraging spots.</td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- COL 4 ROW 2: WHY THIS -->
+    <div class="card accent">
+      <div class="card-label">Why This Project</div>
+      <p style="font-size:9.5px;color:#333;line-height:1.5;font-style:italic;">"I found this to be the most in alignment with my current interests. Foraging is something I genuinely care about, and I think this app could serve a real purpose — not just for people like me, but for general outdoors lovers and anyone who wants an excuse to go outside."</p>
+      <p style="font-size:9px;color:#888;margin-top:2px;">— Noah</p>
+    </div>
+
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <span>Bramble · Senior Shadow Program Capstone · May 2026</span>
+    <span>bramblemap.com · Built with Next.js + Vercel + Supabase</span>
+  </div>
+
+</body>
+</html>
