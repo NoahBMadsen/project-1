@@ -9,12 +9,63 @@
 
 ---
 
+## Technology Stack
+
+### Frontend
+| Layer | Technology | Why |
+|---|---|---|
+| **Framework** | Next.js (App Router) on Vercel | React-based, file-system routing, serverless API routes, first-class Vercel deployment |
+| **Styling** | Tailwind CSS | Utility-first, mobile-friendly by default, fast to build with |
+| **UI components** | shadcn/ui | Pre-built accessible components built on Tailwind; copy-paste into the project, no vendor lock-in |
+| **Maps** | react-leaflet + Leaflet.markercluster | react-leaflet is the React wrapper for Leaflet.js (already chosen); markercluster handles community pin grouping at the map level |
+| **Server state / caching** | TanStack Query | Manages API calls, caching, and loading states for plant ID results, map pins, journal entries |
+| **Forms & validation** | React Hook Form + Zod | Lightweight form management with TypeScript schema validation |
+| **Camera** | `navigator.mediaDevices.getUserMedia()` + `<input type="file" accept="image/*" capture="environment">` | `getUserMedia` streams the rear camera live in-browser for the scan viewfinder. The `<input capture>` fallback opens the native camera app on mobile if `getUserMedia` is unavailable. Together these cover all modern browsers and iOS/Android. |
+| **Geolocation** | `navigator.geolocation.getCurrentPosition()` | Returns the device's current latitude/longitude. Used to center the map on load, attach coordinates to journal entries, and calculate the 25-mile radius for plant/pin queries. Browser prompts the user for permission on first use. |
+
+### Backend
+| Layer | Technology | Why |
+|---|---|---|
+| **API** | Next.js API Routes (serverless) | Co-located with the frontend, auto-deployed as Vercel serverless functions |
+| **Database** | Supabase (PostgreSQL + PostGIS) | Postgres gives relational data modeling; PostGIS extension handles the 25-mile radius geospatial queries natively. Supabase free tier is generous for v1. |
+| **ORM** | Drizzle ORM | TypeScript-native, lightweight, generates type-safe queries directly from your schema. Less abstraction than Prisma — closer to writing SQL, which helps with learning. |
+| **Auth** | Supabase Auth | Comes built into Supabase. Handles session management, JWTs, and OAuth flows out of the box. |
+| **OAuth Provider** | Google only (v1) | Covers the vast majority of users; simpler to configure and maintain than multi-provider. |
+| **File storage** | Supabase Storage | Stores user-uploaded photos attached to journal entries. Seeded species stock images also stored here. |
+
+### Plant Identification
+| Role | Technology | Details |
+|---|---|---|
+| **ID engine** | Pl@ntNet API (free tier) | Receives a photo, returns a ranked species match with confidence score. Free tier: 500 identifications/day — sufficient for a capstone demo. If Bramble scales, Pro plan is €1,000/year. |
+| **Plant profile data** | USDA PLANTS database | One-time bulk data seeding into Supabase at project setup. Powers all browse, search, and filter features. Includes edibility/safety info, invasive/noxious flags, geolocation ranges, and common names. |
+| **Species name mapping** | Custom matching layer | Pl@ntNet returns a scientific species name. That name is matched against the seeded USDA records to pull the full plant profile — safety info, edibility category, invasive flag, images. This is how a camera scan connects to your searchable database. |
+| **Seed images** | USDA PLANTS / PlantNet-300K | One stock image per species stored in Supabase Storage. Used on plant cards and as the canonical map pin image for that species. |
+
+### Data Flow: Camera Scan
+```
+User takes photo
+    → Browser sends image to Pl@ntNet API
+    → Pl@ntNet returns: scientific name + confidence score
+    → App looks up scientific name in Supabase (USDA-seeded records)
+    → Returns: safety info, edibility, invasive flag, stock image
+    → Pre-fills journal entry with: plant name, date, GPS coordinates
+    → User can attach their own photo to the journal entry (stored in Supabase Storage)
+    → If plant is novel (not in DB), triggers Community Field Guide contribution flow
+```
+
+### Map Pin Image Policy
+- **Map pins** always display the **seeded stock image** for the species (consistent, no per-user storage cost)
+- **Journal entries** can have a **user-uploaded photo** attached (personal record, visible only to the user in v1)
+- User photos are stored in Supabase Storage; the seeded stock image lives alongside them in a separate bucket
+
+---
+
 ## Open Design Decisions
 
 | Decision | Options | Consideration |
 |---|---|---|
-| **Map pin image source** | A) Use seeded database image (USDA / PlantNet-300K) &nbsp; B) Use user's photo taken at scan time | Option A is cheaper — no per-user storage cost, consistent image quality. Option B is more authentic — shows the actual local specimen. Option A is likely correct for v1; user photos could replace or supplement in v2. Decide based on storage cost and Supabase free tier limits. |
-| **Map library** | Leaflet.js vs. Google Maps | Leaflet.js is free and open source; Google Maps has a generous free tier but costs money at scale. Leaflet.js recommended for v1. |
+| **Map pin image source** | ~~A) Seeded DB image &nbsp; B) User's scan photo~~ | **Resolved:** Map pins always use the seeded stock image (consistent, no per-user storage cost). Users can attach their own photo to the journal entry separately. |
+| **Map library** | ~~Leaflet.js vs. Google Maps~~ | **Resolved:** Leaflet.js via react-leaflet. Free, open source, no API key required. Google Maps deferred to v2 if needed. |
 
 ---
 
@@ -26,7 +77,7 @@
 | 1 | **User entity** | Handles account creation, login, logout, and profile so every user's journal entries, shared finds, and map pins are tied to them personally. |
 | 2 | **Plant database** | A structured dataset of forageable plants (images, identifiable features, edibility/safety notes, geolocation) that users can browse and search at any time — returnable as a row list or directly on the map. Default filter is all plants within 25 miles; radius is user-adjustable. Built to be trainable by an AI model later. |
 | 3 | **Community map** | The default app view — opens to a map centered on the user's location with their pin shown. All community entries within the user's radius are displayed and clustered accordingly. Users can also switch to map view while browsing the plant database to see results plotted geographically. |
-| 4 | **AI plant identification** | User points their camera at a plant and takes a photo — the app sends it to the Plant.id API or iNaturalist CV API and returns an identification. Immediately displays the plant's safety info, best uses, and key features from the database. The result automatically pre-fills a journal entry with the plant name, date, and location. |
+| 4 | **AI plant identification** | User points their camera at a plant and takes a photo — the app sends it to the Pl@ntNet API, which returns a species identification and confidence score. The species name is matched against the USDA-seeded database to display safety info, best uses, and key features. The result automatically pre-fills a journal entry with the plant name, date, and location. |
 | 5 | **Personal journal** | Auto-created after each AI identification, pre-filled with plant name, location, and date. Users can add personal notes to each entry — notes are private and never shared at launch. |
 | 6 | **Community Field Guide** | A crowd-built reference that only grows when a user finds a plant not already in Bramble's seeded database — novel finds fill the gaps that USDA and PlantNet data don't cover. |
 | 7 | **Mobile-friendly UI** | Ensures the app works cleanly on a phone screen, since users will be in the field when they use it. |
