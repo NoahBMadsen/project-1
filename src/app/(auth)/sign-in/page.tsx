@@ -2,21 +2,32 @@
 
 import { createClient } from "@/lib/supabase/client";
 import { useSearchParams } from "next/navigation";
-import { Suspense } from "react";
+import { Suspense, useState } from "react";
 
 function SignInForm() {
   const searchParams = useSearchParams();
   const next = searchParams.get("next") ?? "/";
-  const error = searchParams.get("error");
+  const urlError = searchParams.get("error");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(urlError);
 
   async function handleGoogleSignIn() {
-    const supabase = createClient();
-    await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`,
-      },
-    });
+    setLoading(true);
+    setError(null);
+    try {
+      const supabase = createClient();
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`,
+        },
+      });
+      if (error) setError(error.message);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Unexpected error. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -33,16 +44,17 @@ function SignInForm() {
 
         {error && (
           <p className="mb-4 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">
-            Sign in failed. Please try again.
+            {error}
           </p>
         )}
 
         <button
           onClick={handleGoogleSignIn}
-          className="flex w-full items-center justify-center gap-3 rounded-xl border border-stone-200 bg-white px-4 py-3 text-sm font-medium text-stone-700 shadow-sm transition hover:bg-stone-50 active:scale-[0.98]"
+          disabled={loading}
+          className="flex w-full items-center justify-center gap-3 rounded-xl border border-stone-200 bg-white px-4 py-3 text-sm font-medium text-stone-700 shadow-sm transition hover:bg-stone-50 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <GoogleIcon />
-          Continue with Google
+          {loading ? "Redirecting…" : "Continue with Google"}
         </button>
       </div>
     </div>
