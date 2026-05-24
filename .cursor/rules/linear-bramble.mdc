@@ -1,0 +1,23 @@
+---
+description: Use only the linear-bramble MCP for Linear work in this project
+alwaysApply: true
+---
+
+# Linear MCP - Bramble workspace only
+
+This project tracks work in the **Madsen Senior Project** Linear workspace (team key **MAD**).
+
+## Required MCP server
+
+- Use **`linear-bramble`** only (`project-0-noah-capstone-linear-bramble`).
+- Do **not** use `user-linear`, `linear`, or any other Linear MCP server in this repo.
+
+## Expected workspace
+
+- One team: **Madsen Senior Project** (prefix **MAD**).
+- If `list_teams` returns Gloo teams or anything other than MAD, stop and report a misconfiguration.
+
+## Auth
+
+- `linear-bramble` authenticates via `LINEAR_BRAMBLE_API_KEY` in the project `.env` file.
+- Create the key in the Madsen Linear workspace: Settings → Account → Security & Access → API keys.
