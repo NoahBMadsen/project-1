@@ -1,3 +1,4 @@
+import { redirect } from "next/navigation";
 import Link from "next/link";
 import {
   Camera,
@@ -7,6 +8,7 @@ import {
   Search,
   ShieldCheck,
 } from "lucide-react";
+import { createClient } from "@/lib/supabase/server";
 
 const features = [
   {
@@ -47,7 +49,10 @@ const features = [
   },
 ];
 
-export default function Home() {
+export default async function Home() {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (user) redirect("/map");
   return (
     <div className="flex min-h-full flex-col bg-stone-50">
       {/* Header */}
