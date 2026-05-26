@@ -93,11 +93,11 @@ export default function ScanPage() {
       <header className="border-b border-stone-200 bg-white">
         <div className="mx-auto flex max-w-2xl items-center gap-4 px-6 py-4">
           <Link
-            href="/dashboard"
+            href="/map"
             className="flex items-center gap-1.5 text-sm text-stone-500 hover:text-stone-700"
           >
             <ArrowLeft className="size-4" />
-            Dashboard
+            Map
           </Link>
           <div className="flex items-center gap-2 ml-auto">
             <Leaf className="size-5 text-emerald-600" />
@@ -298,10 +298,10 @@ export default function ScanPage() {
                 Scan Another
               </button>
               <Link
-                href="/dashboard"
+                href="/map"
                 className="flex flex-1 items-center justify-center rounded-xl bg-emerald-600 px-4 py-3 text-sm font-medium text-white transition hover:bg-emerald-700"
               >
-                Back to Dashboard
+                Back to Map
               </Link>
             </div>
           </div>
