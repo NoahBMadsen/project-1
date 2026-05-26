@@ -257,56 +257,80 @@ export default function ScanPage() {
               </div>
             </div>
 
-            <div className="mt-4 flex flex-wrap gap-2">
-              {result.plant?.edible && (
-                <span className="rounded-full bg-green-100 px-3 py-1 text-xs font-medium text-green-700">
-                  Edible
-                </span>
-              )}
-              {result.plant?.medicinal && (
-                <span className="rounded-full bg-blue-100 px-3 py-1 text-xs font-medium text-blue-700">
-                  Medicinal
-                </span>
-              )}
-              {result.plant?.toxic && (
-                <span className="rounded-full bg-red-100 px-3 py-1 text-xs font-medium text-red-700">
-                  Toxic - Use Caution
-                </span>
-              )}
-              {result.plant?.invasive && (
-                <span className="rounded-full bg-orange-100 px-3 py-1 text-xs font-medium text-orange-700">
-                  Invasive Species
-                </span>
-              )}
-            </div>
+            {(() => {
+              const p = result.plant;
+              const hasVerifiedSafety =
+                p && (p.edible || p.medicinal || p.toxic || p.safety_notes);
 
-            {result.plant?.safety_notes && (
-              <div className="mt-4 rounded-xl bg-amber-50 p-3">
-                <p className="text-xs font-semibold text-amber-800">
-                  Safety Info
-                </p>
-                <p className="mt-1 text-sm text-amber-700">
-                  {result.plant.safety_notes}
-                </p>
-              </div>
-            )}
+              if (!hasVerifiedSafety) {
+                return (
+                  <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-4">
+                    <p className="text-sm font-semibold text-amber-800">
+                      Safety data not yet verified
+                    </p>
+                    <p className="mt-1 text-sm text-amber-700">
+                      Safety data for this species has not been verified yet.
+                      Do not consume any plant you cannot positively identify.
+                    </p>
+                  </div>
+                );
+              }
 
-            {result.plant?.edibility_notes && (
-              <div className="mt-3 rounded-xl bg-stone-50 p-3">
-                <p className="text-xs font-semibold text-stone-600">
-                  Edibility
-                </p>
-                <p className="mt-1 text-sm text-stone-600">
-                  {result.plant.edibility_notes}
-                </p>
-              </div>
-            )}
+              return (
+                <>
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    {p?.edible && (
+                      <span className="rounded-full bg-green-100 px-3 py-1 text-xs font-medium text-green-700">
+                        Edible
+                      </span>
+                    )}
+                    {p?.medicinal && (
+                      <span className="rounded-full bg-blue-100 px-3 py-1 text-xs font-medium text-blue-700">
+                        Medicinal
+                      </span>
+                    )}
+                    {p?.toxic && (
+                      <span className="rounded-full bg-red-100 px-3 py-1 text-xs font-medium text-red-700">
+                        Toxic - Use Caution
+                      </span>
+                    )}
+                    {p?.invasive && (
+                      <span className="rounded-full bg-orange-100 px-3 py-1 text-xs font-medium text-orange-700">
+                        Invasive Species
+                      </span>
+                    )}
+                  </div>
 
-            {result.plant?.native_range && (
-              <p className="mt-3 text-xs text-stone-400">
-                Native range: {result.plant.native_range}
-              </p>
-            )}
+                  {p?.safety_notes && (
+                    <div className="mt-4 rounded-xl bg-amber-50 p-3">
+                      <p className="text-xs font-semibold text-amber-800">
+                        Safety Info
+                      </p>
+                      <p className="mt-1 text-sm text-amber-700">
+                        {p.safety_notes}
+                      </p>
+                    </div>
+                  )}
+
+                  {p?.edibility_notes && (
+                    <div className="mt-3 rounded-xl bg-stone-50 p-3">
+                      <p className="text-xs font-semibold text-stone-600">
+                        Edibility
+                      </p>
+                      <p className="mt-1 text-sm text-stone-600">
+                        {p.edibility_notes}
+                      </p>
+                    </div>
+                  )}
+
+                  {p?.native_range && (
+                    <p className="mt-3 text-xs text-stone-400">
+                      Native range: {p.native_range}
+                    </p>
+                  )}
+                </>
+              );
+            })()}
           </div>
 
           {!saved ? (
