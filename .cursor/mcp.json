@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "linear-bramble": {
+      "url": "https://mcp.linear.app/mcp",
+      "envFile": "${workspaceFolder}/.env",
+      "headers": {
+        "Authorization": "Bearer ${env:LINEAR_BRAMBLE_API_KEY}"
+      }
+    }
+  }
+}

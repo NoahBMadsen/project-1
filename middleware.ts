@@ -4,6 +4,7 @@ import { NextResponse, type NextRequest } from "next/server";
 export async function middleware(request: NextRequest) {
   // Only run auth logic on protected routes — avoids crashing on static/public pages
   const isProtected =
+    request.nextUrl.pathname.startsWith("/dashboard") ||
     request.nextUrl.pathname.startsWith("/journal") ||
     request.nextUrl.pathname.startsWith("/scan");
 
