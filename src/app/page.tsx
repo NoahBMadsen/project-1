@@ -49,7 +49,14 @@ const features = [
   },
 ];
 
-export default async function Home() {
+export default async function Home({
+  searchParams,
+}: {
+  searchParams: Promise<{ code?: string }>;
+}) {
+  const { code } = await searchParams;
+  if (code) redirect(`/auth/callback?code=${code}`);
+
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (user) redirect("/map");
