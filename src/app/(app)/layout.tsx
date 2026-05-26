@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { BottomNav } from "@/components/bottom-nav";
+import { LocationProvider } from "@/components/location-provider";
 import { Leaf, LogOut } from "lucide-react";
 import Link from "next/link";
 
@@ -48,7 +49,9 @@ export default async function AppLayout({
         </div>
       </header>
 
-      <main className="flex-1 pb-20">{children}</main>
+      <LocationProvider>
+        <main className="flex-1 pb-20">{children}</main>
+      </LocationProvider>
 
       <BottomNav />
     </div>

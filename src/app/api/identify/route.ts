@@ -187,8 +187,8 @@ export async function POST(request: Request) {
       const newFamily = usdaMatch?.family ?? (family || null);
 
       const inserted = await sql`
-        INSERT INTO plants (scientific_name, common_name, family, invasive)
-        VALUES (${newName}, ${newCommon}, ${newFamily}, ${isInvasive})
+        INSERT INTO plants (scientific_name, common_name, family, invasive, image_url)
+        VALUES (${newName}, ${newCommon}, ${newFamily}, ${isInvasive}, ${relatedImage})
         ON CONFLICT (scientific_name) DO NOTHING
         RETURNING *
       `;
@@ -203,6 +203,14 @@ export async function POST(request: Request) {
         `;
         dbPlant = refetch[0] ?? null;
       }
+    }
+
+    if (dbPlant && relatedImage && !dbPlant.image_url) {
+      await sql`
+        UPDATE plants SET image_url = ${relatedImage}, updated_at = NOW()
+        WHERE id = ${dbPlant.id}
+      `;
+      dbPlant.image_url = relatedImage;
     }
 
     return NextResponse.json({

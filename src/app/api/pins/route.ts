@@ -39,6 +39,7 @@ export async function GET(request: Request) {
       p.toxic,
       p.invasive,
       p.safety_notes,
+      p.image_url,
       u.display_name as user_display_name
     FROM community_pins cp
     LEFT JOIN plants p ON cp.plant_id = p.id

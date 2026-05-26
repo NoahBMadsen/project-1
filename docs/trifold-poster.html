@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Bramble - Trifold Poster Board</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f4; padding: 24px; }
+  .poster { display: flex; border: 2px solid #d6d3d1; border-radius: 8px; overflow: hidden; max-width: 1200px; margin: 0 auto; }
+  .panel-left, .panel-right { flex: 0 0 25%; padding: 20px; background: #fafaf8; }
+  .panel-left { border-right: 2px dashed #e7e5e4; }
+  .panel-right { border-left: 2px dashed #e7e5e4; }
+  .panel-center { flex: 0 0 50%; padding: 24px; background: white; display: flex; flex-direction: column; align-items: center; }
+  .panel-title { font-size: 16px; font-weight: 800; color: #14532d; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 4px; }
+  .panel-subtitle { font-size: 9px; color: #78716c; margin-bottom: 6px; }
+  .panel-title-bar { width: 40px; height: 3px; background: #16a34a; border-radius: 2px; margin-bottom: 14px; }
+  .section-title { font-size: 11px; font-weight: 700; color: #1c1917; margin-bottom: 6px; }
+  .body-text { font-size: 8px; color: #78716c; line-height: 1.5; }
+  .timeline-item { display: flex; gap: 8px; align-items: flex-start; margin-bottom: 6px; }
+  .timeline-dot { width: 8px; height: 8px; border-radius: 50%; background: #16a34a; flex-shrink: 0; margin-top: 3px; }
+  .timeline-title { font-size: 10px; font-weight: 700; color: #1c1917; }
+  .timeline-detail { font-size: 8px; color: #78716c; line-height: 1.3; }
+  .tool-badges { display: flex; flex-wrap: wrap; gap: 3px; }
+  .tool-badge { padding: 2px 7px; border-radius: 10px; border: 1px solid #e7e5e4; background: white; font-size: 7px; font-weight: 500; color: #44403c; }
+  .skill-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 3px; }
+  .skill-name { font-size: 8px; color: #44403c; }
+  .skill-level { font-size: 6px; font-weight: 600; padding: 1px 5px; border-radius: 4px; }
+  .level-internalized { background: #16a34a; color: white; }
+  .level-practiced { background: #dbeafe; color: #1e40af; }
+  .level-exposed { background: #fffbeb; color: #b45309; }
+  .legend { display: flex; gap: 8px; margin-top: 6px; }
+  .legend-item { display: flex; align-items: center; gap: 3px; font-size: 6px; color: #78716c; }
+  .legend-dot { width: 8px; height: 8px; border-radius: 2px; }
+
+  .logo-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .logo-text { font-size: 30px; font-weight: 800; color: #1c1917; letter-spacing: -1px; }
+  .logo-sub { font-size: 10px; color: #16a34a; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; }
+  .app-desc { font-size: 9px; color: #78716c; text-align: center; max-width: 360px; line-height: 1.5; margin-bottom: 10px; }
+
+  .phones { display: flex; gap: 12px; justify-content: center; align-items: flex-start; margin-bottom: 12px; }
+  .phone { display: flex; flex-direction: column; align-items: center; gap: 5px; }
+  .phone-frame { width: 110px; height: 200px; border-radius: 14px; border: 3px solid #1c1917; background: white; overflow: hidden; display: flex; flex-direction: column; }
+  .phone-notch { height: 14px; background: #1c1917; display: flex; align-items: center; justify-content: center; }
+  .phone-notch-inner { width: 28px; height: 4px; border-radius: 2px; background: #44403c; }
+  .phone-screen { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 6px; gap: 3px; }
+  .phone-label { font-size: 8px; font-weight: 600; color: #44403c; }
+  .screen-title { font-size: 7px; font-weight: 600; color: #44403c; }
+  .screen-text { font-size: 5px; color: #78716c; text-align: center; }
+  .screen-btn { padding: 2px 8px; border-radius: 5px; background: #16a34a; color: white; font-size: 5px; font-weight: 600; margin-top: 4px; }
+  .screen-landing { background: white; }
+  .screen-map { background: #e8f5e9; }
+  .screen-scan { background: #f0f9ff; }
+  .screen-result { background: white; }
+  .map-area { width: 100%; flex: 1; border-radius: 5px; background: #c8e6c9; position: relative; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+  .map-pin { position: absolute; width: 7px; height: 7px; border-radius: 50%; border: 1px solid white; }
+  .nav-bar { display: flex; gap: 6px; margin-top: 3px; }
+  .nav-item { font-size: 5px; color: #a8a29e; }
+  .nav-active { color: #16a34a; font-weight: 700; }
+  .scan-circle { width: 36px; height: 36px; border-radius: 50%; border: 2px solid #16a34a; display: flex; align-items: center; justify-content: center; font-size: 12px; }
+  .scan-area { width: 100%; flex: 1; border-radius: 5px; background: #e3f2fd; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; }
+  .result-box { width: 100%; padding: 4px; background: #dcfce7; border-radius: 5px; text-align: center; }
+  .result-name { font-size: 6px; font-weight: 700; color: #14532d; }
+  .result-common { font-size: 5px; color: #78716c; }
+  .result-conf { font-size: 5px; color: #16a34a; margin-top: 1px; }
+  .result-tags { display: flex; gap: 3px; margin-top: 2px; }
+  .tag { padding: 1px 4px; border-radius: 3px; font-size: 5px; }
+  .tag-edible { background: #dcfce7; color: #14532d; }
+  .tag-medicinal { background: #dbeafe; color: #1e40af; }
+  .journal-entry { width: 100%; padding: 3px; border-bottom: 1px solid #e7e5e4; font-size: 5px; color: #44403c; }
+
+  .steps { display: flex; gap: 20px; justify-content: center; margin: 10px 0; }
+  .step { display: flex; flex-direction: column; align-items: center; gap: 3px; width: 110px; }
+  .step-num { width: 22px; height: 22px; border-radius: 50%; background: #16a34a; color: white; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; }
+  .step-title { font-size: 10px; font-weight: 700; color: #1c1917; }
+  .step-desc { font-size: 7px; color: #78716c; text-align: center; }
+
+  .features-grid { width: 100%; display: flex; gap: 12px; margin-top: 8px; }
+  .features-col { flex: 1; display: flex; flex-direction: column; gap: 8px; }
+  .feature-item { display: flex; gap: 8px; align-items: flex-start; }
+  .feature-dot { width: 6px; height: 6px; border-radius: 50%; background: #16a34a; flex-shrink: 0; margin-top: 4px; }
+  .feature-title { font-size: 10px; font-weight: 700; color: #1c1917; }
+  .feature-desc { font-size: 8px; color: #78716c; line-height: 1.4; }
+
+  .tech-bar { width: 100%; padding: 8px 14px; background: #dcfce7; border-radius: 8px; border: 1px solid #16a34a; display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
+  .tech-label { font-size: 9px; font-weight: 700; color: #14532d; }
+  .tech-list { font-size: 7px; color: #44403c; margin-top: 2px; line-height: 1.5; }
+  .tech-credit { font-size: 7px; color: #a8a29e; text-align: right; white-space: nowrap; }
+
+  .lesson-card { padding: 10px; background: white; border-radius: 8px; border-left: 3px solid #16a34a; margin-bottom: 8px; }
+  .lesson-header { display: flex; gap: 6px; align-items: flex-start; }
+  .lesson-num { width: 18px; height: 18px; border-radius: 50%; background: #dcfce7; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 800; color: #14532d; flex-shrink: 0; }
+  .lesson-quote { font-size: 9px; font-weight: 700; color: #14532d; font-style: italic; line-height: 1.3; }
+  .lesson-explain { font-size: 7px; color: #78716c; margin-top: 3px; line-height: 1.4; }
+
+  .takeaway { padding: 10px; background: #dcfce7; border-radius: 8px; border: 1px solid #16a34a; margin-top: 8px; }
+  .takeaway-text { font-size: 9px; color: #14532d; line-height: 1.5; font-style: italic; font-weight: 600; }
+
+  .qr-box { margin-top: auto; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 12px; background: white; border-radius: 10px; border: 1px solid #e7e5e4; }
+  .qr-title { font-size: 10px; font-weight: 700; color: #1c1917; }
+  .qr-url { font-size: 13px; font-weight: 800; color: #16a34a; letter-spacing: 0.5px; }
+  .qr-placeholder { width: 100px; height: 100px; border: 2px solid #1c1917; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 8px; color: #78716c; text-align: center; padding: 8px; background: white; }
+
+  .divider { width: 100%; height: 1px; background: #e7e5e4; margin: 10px 0; }
+
+  .section-gap { margin-top: 12px; }
+
+  .leaf-svg { display: inline-block; vertical-align: middle; }
+
+  @media print {
+    body { padding: 0; background: white; }
+    .poster { border: none; border-radius: 0; }
+    .instructions { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<p class="instructions" style="max-width: 1200px; margin: 0 auto 12px; font-size: 13px; color: #78716c;">
+  Bramble Trifold Poster Board Preview. Print each panel separately or screenshot for layout reference. Replace the QR placeholder with a real QR code from <a href="https://www.qr-code-generator.com" target="_blank">qr-code-generator.com</a> pointing to bramblemap.com.
+</p>
+
+<div class="poster">
+
+  <!-- LEFT PANEL -->
+  <div class="panel-left">
+    <div class="panel-title">What I Did</div>
+    <div class="panel-subtitle">2-Week Software Engineering Shadow</div>
+    <div class="panel-title-bar"></div>
+
+    <div class="body-text" style="margin-bottom: 12px;">
+      Shadowed a senior software engineer for two weeks in a hybrid format - in-person office days and remote distributed team simulation via Slack and Zoom. Learned the full software development lifecycle from ideation to deployment.
+    </div>
+
+    <div class="section-title">The Timeline</div>
+    <div class="timeline-item"><div class="timeline-dot"></div><div><div class="timeline-title">Day 1 - Hello World</div><div class="timeline-detail">Dev environment setup. Created first GitHub repo. Built and deployed a website.</div></div></div>
+    <div class="timeline-item"><div class="timeline-dot"></div><div><div class="timeline-title">Day 2 - Real Engineering</div><div class="timeline-detail">Observed standup and sprint planning. Whiteboarded web architecture and database design.</div></div></div>
+    <div class="timeline-item"><div class="timeline-dot"></div><div><div class="timeline-title">Day 3 - Ideation</div><div class="timeline-detail">Brainstormed app ideas with AI. Evaluated 3 finalists. Selected Bramble.</div></div></div>
+    <div class="timeline-item"><div class="timeline-dot"></div><div><div class="timeline-title">Weekend - JavaScript</div><div class="timeline-detail">freeCodeCamp JavaScript course. Variables, loops, conditionals, functions.</div></div></div>
+    <div class="timeline-item"><div class="timeline-dot"></div><div><div class="timeline-title">Remote Day - Distributed Work</div><div class="timeline-detail">Full remote simulation. Standups on Zoom. Slack threading. End-of-day reports.</div></div></div>
+    <div class="timeline-item"><div class="timeline-dot"></div><div><div class="timeline-title">Architecture Day</div><div class="timeline-detail">Wireframes in Excalidraw. Tech stack decisions. Database schema with 5 tables.</div></div></div>
+    <div class="timeline-item"><div class="timeline-dot"></div><div><div class="timeline-title">Build Days</div><div class="timeline-detail">Linear project management. Auth, database, Vercel deployment. 5 PRs merged.</div></div></div>
+    <div class="timeline-item"><div class="timeline-dot"></div><div><div class="timeline-title">Final Sprint</div><div class="timeline-detail">AI plant ID, community map, journal, invasive species detection. Shipped to bramblemap.com.</div></div></div>
+
+    <div class="section-gap"></div>
+    <div class="section-title">Tools I Used</div>
+    <div class="tool-badges">
+      <span class="tool-badge">Cursor IDE</span>
+      <span class="tool-badge">Claude AI</span>
+      <span class="tool-badge">GitHub</span>
+      <span class="tool-badge">Linear</span>
+      <span class="tool-badge">Slack</span>
+      <span class="tool-badge">Zoom</span>
+      <span class="tool-badge">TypeScript</span>
+      <span class="tool-badge">React</span>
+      <span class="tool-badge">Next.js</span>
+      <span class="tool-badge">Tailwind CSS</span>
+      <span class="tool-badge">Supabase</span>
+      <span class="tool-badge">PostGIS</span>
+      <span class="tool-badge">Drizzle ORM</span>
+      <span class="tool-badge">Vercel</span>
+      <span class="tool-badge">Excalidraw</span>
+      <span class="tool-badge">freeCodeCamp</span>
+    </div>
+
+    <div class="section-gap"></div>
+    <div class="section-title">Skills Developed</div>
+    <div class="skill-row"><span class="skill-name">JavaScript Fundamentals</span><span class="skill-level level-practiced">Practiced</span></div>
+    <div class="skill-row"><span class="skill-name">Git & GitHub Workflows</span><span class="skill-level level-practiced">Practiced</span></div>
+    <div class="skill-row"><span class="skill-name">AI-Assisted Engineering</span><span class="skill-level level-internalized">Internalized</span></div>
+    <div class="skill-row"><span class="skill-name">Project Management (Linear)</span><span class="skill-level level-practiced">Practiced</span></div>
+    <div class="skill-row"><span class="skill-name">Database Schema Design</span><span class="skill-level level-exposed">Exposed</span></div>
+    <div class="skill-row"><span class="skill-name">Auth & Deployment</span><span class="skill-level level-practiced">Practiced</span></div>
+    <div class="skill-row"><span class="skill-name">Distributed Team Work</span><span class="skill-level level-practiced">Practiced</span></div>
+    <div class="skill-row"><span class="skill-name">Professional Communication</span><span class="skill-level level-internalized">Internalized</span></div>
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot" style="background:#16a34a"></div>Internalized</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#dbeafe"></div>Practiced</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#fffbeb;border:1px solid #b45309"></div>Exposed</div>
+    </div>
+  </div>
+
+  <!-- CENTER PANEL -->
+  <div class="panel-center">
+    <div class="logo-row">
+      <svg class="leaf-svg" width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M11 20A7 7 0 0 1 9.8 6.9C15.5 4.9 20 7 20 7s2.1 4.5 .1 10.2A7 7 0 0 1 11 20"/>
+        <path d="M10 20.5c2-2.5 3-5 3.5-8.5"/>
+      </svg>
+      <div>
+        <div class="logo-text">Bramble</div>
+        <div class="logo-sub">Community Foraging App</div>
+      </div>
+    </div>
+
+    <div class="app-desc">
+      Identify wild plants with AI, keep a foraging journal, and share discoveries on a community map. Built for foragers, hikers, and the naturally curious.
+    </div>
+
+    <!-- Phone mockups -->
+    <div class="phones">
+      <div class="phone">
+        <div class="phone-frame">
+          <div class="phone-notch"><div class="phone-notch-inner"></div></div>
+          <div class="phone-screen screen-landing">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.9C15.5 4.9 20 7 20 7s2.1 4.5 .1 10.2A7 7 0 0 1 11 20"/><path d="M10 20.5c2-2.5 3-5 3.5-8.5"/></svg>
+            <div style="font-size:9px;font-weight:700;color:#1c1917">Bramble</div>
+            <div class="screen-text">Know what grows around you</div>
+            <div class="screen-btn">Get Started</div>
+          </div>
+        </div>
+        <div class="phone-label">Landing</div>
+      </div>
+
+      <div class="phone">
+        <div class="phone-frame">
+          <div class="phone-notch"><div class="phone-notch-inner"></div></div>
+          <div class="phone-screen screen-map">
+            <div class="screen-title">Community Map</div>
+            <div class="map-area">
+              &#127758;
+              <div class="map-pin" style="top:25px;left:18px;background:#16a34a"></div>
+              <div class="map-pin" style="top:45px;left:55px;background:#ef4444"></div>
+              <div class="map-pin" style="top:65px;left:35px;background:#16a34a"></div>
+            </div>
+            <div class="nav-bar">
+              <span class="nav-item nav-active">Map</span>
+              <span class="nav-item">Scan</span>
+              <span class="nav-item">Log</span>
+              <span class="nav-item">DB</span>
+            </div>
+          </div>
+        </div>
+        <div class="phone-label">Map</div>
+      </div>
+
+      <div class="phone">
+        <div class="phone-frame">
+          <div class="phone-notch"><div class="phone-notch-inner"></div></div>
+          <div class="phone-screen screen-scan">
+            <div class="screen-title">Scan a Plant</div>
+            <div class="scan-area">
+              <div class="scan-circle">&#128247;</div>
+              <div class="screen-text">Tap to capture</div>
+            </div>
+          </div>
+        </div>
+        <div class="phone-label">Scan</div>
+      </div>
+
+      <div class="phone">
+        <div class="phone-frame">
+          <div class="phone-notch"><div class="phone-notch-inner"></div></div>
+          <div class="phone-screen screen-result">
+            <div class="screen-title">Identified!</div>
+            <div class="result-box">
+              <div class="result-name">Taraxacum officinale</div>
+              <div class="result-common">Common Dandelion</div>
+              <div class="result-conf">94% confidence</div>
+            </div>
+            <div class="result-tags">
+              <span class="tag tag-edible">Edible</span>
+              <span class="tag tag-medicinal">Medicinal</span>
+            </div>
+            <div class="screen-btn" style="margin-top:3px">Save to Journal</div>
+          </div>
+        </div>
+        <div class="phone-label">Results</div>
+      </div>
+    </div>
+
+    <!-- How it works -->
+    <div class="steps">
+      <div class="step"><div class="step-num">1</div><div class="step-title">Scan</div><div class="step-desc">Point your camera at any plant</div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-title">Identify</div><div class="step-desc">AI matches against thousands of species</div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-title">Learn & Share</div><div class="step-desc">Get safety info, save, and pin on the map</div></div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Features -->
+    <div class="features-grid">
+      <div class="features-col">
+        <div class="section-title">Features</div>
+        <div class="feature-item"><div class="feature-dot"></div><div><div class="feature-title">AI Plant Identification</div><div class="feature-desc">Snap a photo and Bramble uses Pl@ntNet to identify the species with confidence scoring.</div></div></div>
+        <div class="feature-item"><div class="feature-dot"></div><div><div class="feature-title">Safety Information</div><div class="feature-desc">Every plant shows edible, medicinal, toxic, and invasive status. Unverified plants show a clear warning.</div></div></div>
+        <div class="feature-item"><div class="feature-dot"></div><div><div class="feature-title">Invasive Species Detection</div><div class="feature-desc">Cross-references 1,500+ species from the USGS national invasive species registry.</div></div></div>
+        <div class="feature-item"><div class="feature-dot"></div><div><div class="feature-title">Community Map</div><div class="feature-desc">Interactive map shows plant discoveries from all users within 25 miles using PostGIS spatial queries.</div></div></div>
+      </div>
+      <div class="features-col">
+        <div class="section-title">&nbsp;</div>
+        <div class="feature-item"><div class="feature-dot"></div><div><div class="feature-title">Foraging Journal</div><div class="feature-desc">Every scan auto-creates an entry with species, GPS, date, and confidence. Add personal notes.</div></div></div>
+        <div class="feature-item"><div class="feature-dot"></div><div><div class="feature-title">Plant Database</div><div class="feature-desc">Search 34,000+ species from the USDA database. Filter by edible, medicinal, toxic, or invasive.</div></div></div>
+        <div class="feature-item"><div class="feature-dot"></div><div><div class="feature-title">Secure Authentication</div><div class="feature-desc">Google OAuth via Supabase. No passwords to remember.</div></div></div>
+        <div class="feature-item"><div class="feature-dot"></div><div><div class="feature-title">3 Data Sources</div><div class="feature-desc">Pl@ntNet API (real-time ID), USDA PLANTS (34k species), USGS US-RIIS (invasive registry).</div></div></div>
+      </div>
+    </div>
+
+    <div class="tech-bar">
+      <div>
+        <div class="tech-label">Tech Stack</div>
+        <div class="tech-list">Next.js 16 / React 19 / TypeScript / Tailwind CSS / Supabase + PostGIS / Drizzle ORM / Vercel</div>
+      </div>
+      <div class="tech-credit">Noah Madsen<br>Senior Capstone, 2026</div>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div class="panel-right" style="display:flex;flex-direction:column;">
+    <div class="panel-title">What I Learned</div>
+    <div class="panel-subtitle">Reflections from a 2-week engineering shadow</div>
+    <div class="panel-title-bar"></div>
+
+    <div class="lesson-card">
+      <div class="lesson-header">
+        <div class="lesson-num">1</div>
+        <div>
+          <div class="lesson-quote">"Asking for help is engineering, not weakness."</div>
+          <div class="lesson-explain">The 20-minute rule: try seriously for 20 minutes, then escalate. Going dark when stuck makes the problem compound while everyone assumes work is happening.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="lesson-card">
+      <div class="lesson-header">
+        <div class="lesson-num">2</div>
+        <div>
+          <div class="lesson-quote">"AI proposes, human curates."</div>
+          <div class="lesson-explain">AI-assisted coding is a multiplier on what you already understand, not a substitute for understanding. The human judgment layer is where engineers earn their keep.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="lesson-card">
+      <div class="lesson-header">
+        <div class="lesson-num">3</div>
+        <div>
+          <div class="lesson-quote">"Infrastructure is invisible to users."</div>
+          <div class="lesson-explain">Building the foundation feels productive. But real engineering is shipping end-to-end. Deciding what to cut matters as much as deciding what to build.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="lesson-card">
+      <div class="lesson-header">
+        <div class="lesson-num">4</div>
+        <div>
+          <div class="lesson-quote">"Show me where in MY code this is referenced."</div>
+          <div class="lesson-explain">When an AI asks for something you don't recognize, ask it to prove the requirement by reading the actual code.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="lesson-card">
+      <div class="lesson-header">
+        <div class="lesson-num">5</div>
+        <div>
+          <div class="lesson-quote">"Match your tools to the shape of the work."</div>
+          <div class="lesson-explain">Cycles for ongoing teams. Milestones for projects with an end date. Default settings aren't always right.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="lesson-card">
+      <div class="lesson-header">
+        <div class="lesson-num">6</div>
+        <div>
+          <div class="lesson-quote">"The next engineer should run it without asking a single question."</div>
+          <div class="lesson-explain">If a machine-specific thing is required, that requirement needs to be documented. That's the difference between code and a product.</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="border-top:1px solid #e7e5e4;padding-top:10px;margin-top:8px">
+      <div class="section-title">The Biggest Takeaway</div>
+      <div class="takeaway">
+        <div class="takeaway-text">"Senior engineers don't ship perfect code. They ship code, then iterate. The skill I needed most wasn't coding - it was saying 'I'm stuck, here's what I tried, can you help?'"</div>
+      </div>
+    </div>
+
+    <div class="qr-box" style="margin-top:16px">
+      <div class="qr-title">Try It Live</div>
+      <div id="qr-container" style="width:120px;height:120px;display:flex;align-items:center;justify-content:center;"></div>
+      <div class="qr-url">bramblemap.com</div>
+    </div>
+  </div>
+
+</div>
+
+<script type="module">
+import QRCode from 'https://cdn.jsdelivr.net/npm/@pjaudiomv/qrcode-svg/dist/qrcode.js';
+const qr = new QRCode({
+  content: 'https://bramblemap.com',
+  width: 120,
+  height: 120,
+  padding: 2,
+  color: '#1c1917',
+  background: '#ffffff',
+  ecl: 'M',
+  join: true,
+  container: 'svg-viewbox',
+});
+document.getElementById('qr-container').innerHTML = qr.svg();
+</script>
+</body>
+</html>

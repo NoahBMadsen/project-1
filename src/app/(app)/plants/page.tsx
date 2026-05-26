@@ -1,7 +1,9 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { Search, Loader2 } from "lucide-react";
+import { Search, Loader2, MapPin } from "lucide-react";
+import { useLocation } from "@/components/location-provider";
+import { PlantImage } from "@/components/plant-image";
 
 interface Plant {
   id: string;
@@ -15,6 +17,7 @@ interface Plant {
   native_range: string | null;
   safety_notes: string | null;
   edibility_notes: string | null;
+  image_url: string | null;
 }
 
 const categories = [
@@ -26,17 +29,24 @@ const categories = [
 ];
 
 export default function PlantsPage() {
+  const { lat: userLat, lng: userLng, radiusMiles } = useLocation();
   const [plants, setPlants] = useState<Plant[]>([]);
   const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("all");
   const [expanded, setExpanded] = useState<string | null>(null);
+  const [nearbyOnly, setNearbyOnly] = useState(true);
 
   const fetchPlants = useCallback(async () => {
     setLoading(true);
     const params = new URLSearchParams();
     if (query) params.set("q", query);
     if (category !== "all") params.set("category", category);
+    if (nearbyOnly && userLat != null && userLng != null) {
+      params.set("lat", String(userLat));
+      params.set("lng", String(userLng));
+      params.set("radius", String(radiusMiles));
+    }
 
     try {
       const res = await fetch(`/api/plants?${params.toString()}`);
@@ -46,7 +56,7 @@ export default function PlantsPage() {
       setPlants([]);
     }
     setLoading(false);
-  }, [query, category]);
+  }, [query, category, nearbyOnly, userLat, userLng, radiusMiles]);
 
   useEffect(() => {
     const timer = setTimeout(fetchPlants, 300);
@@ -68,7 +78,7 @@ export default function PlantsPage() {
         />
       </div>
 
-      <div className="mb-6 flex gap-2 overflow-x-auto">
+      <div className="mb-4 flex items-center gap-2 overflow-x-auto">
         {categories.map((cat) => (
           <button
             key={cat.key}
@@ -83,6 +93,20 @@ export default function PlantsPage() {
           </button>
         ))}
       </div>
+
+      {userLat != null && (
+        <button
+          onClick={() => setNearbyOnly(!nearbyOnly)}
+          className={`mb-6 flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition ${
+            nearbyOnly
+              ? "bg-emerald-100 text-emerald-700"
+              : "border border-stone-200 bg-white text-stone-500"
+          }`}
+        >
+          <MapPin className="size-3" />
+          {nearbyOnly ? `Nearby (${radiusMiles} mi)` : "All plants"}
+        </button>
+      )}
 
       {loading ? (
         <div className="flex h-40 items-center justify-center">
@@ -102,12 +126,20 @@ export default function PlantsPage() {
               }
               className="w-full rounded-2xl border border-stone-200 bg-white p-4 text-left transition hover:border-stone-300"
             >
-              <div className="flex items-start justify-between">
-                <div>
+              <div className="flex items-start gap-3">
+                <div className="relative size-14 shrink-0 overflow-hidden rounded-xl">
+                  <PlantImage
+                    plantId={plant.id}
+                    scientificName={plant.scientific_name}
+                    imageUrl={plant.image_url}
+                    alt={plant.common_name ?? plant.scientific_name}
+                  />
+                </div>
+                <div className="min-w-0 flex-1">
                   <h3 className="font-semibold text-stone-900">
                     {plant.common_name ?? plant.scientific_name}
                   </h3>
-                  <p className="text-xs italic text-stone-400">
+                  <p className="truncate text-xs italic text-stone-400">
                     {plant.scientific_name}
                   </p>
                   {plant.family && (
