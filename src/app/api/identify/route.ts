@@ -76,6 +76,30 @@ function getUSDALookup(): Map<string, USDAEntry> {
   return usdaCache;
 }
 
+let invasiveCache: Set<string> | null = null;
+
+function getInvasiveLookup(): Set<string> {
+  if (invasiveCache) return invasiveCache;
+
+  invasiveCache = new Set();
+  const tsvPath = path.join(process.cwd(), "data", "usgs-invasive.tsv");
+  if (!fs.existsSync(tsvPath)) return invasiveCache;
+
+  const raw = fs.readFileSync(tsvPath, "utf-8");
+  const lines = raw.split("\n");
+
+  for (let i = 1; i < lines.length; i++) {
+    const line = lines[i].trim();
+    if (!line) continue;
+    const [name, flag] = line.split("\t");
+    if (flag === "true" && name) {
+      invasiveCache.add(name.toLowerCase());
+    }
+  }
+
+  return invasiveCache;
+}
+
 export async function POST(request: Request) {
   const supabase = await createClient();
   const {
@@ -155,14 +179,16 @@ export async function POST(request: Request) {
     if (!dbPlant && scientificName) {
       const usda = getUSDALookup();
       const usdaMatch = usda.get(scientificName.toLowerCase());
+      const invasiveSet = getInvasiveLookup();
+      const isInvasive = invasiveSet.has(scientificName.toLowerCase());
 
       const newName = usdaMatch?.scientific_name ?? scientificName;
       const newCommon = usdaMatch?.common_name ?? commonNames[0] ?? null;
       const newFamily = usdaMatch?.family ?? (family || null);
 
       const inserted = await sql`
-        INSERT INTO plants (scientific_name, common_name, family)
-        VALUES (${newName}, ${newCommon}, ${newFamily})
+        INSERT INTO plants (scientific_name, common_name, family, invasive)
+        VALUES (${newName}, ${newCommon}, ${newFamily}, ${isInvasive})
         ON CONFLICT (scientific_name) DO NOTHING
         RETURNING *
       `;

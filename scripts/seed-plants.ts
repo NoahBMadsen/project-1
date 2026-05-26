@@ -583,9 +583,48 @@ async function seedFromCSV() {
   console.log(`\nUSDA bulk import complete — ${inserted} rows upserted.`);
 }
 
+async function backfillInvasive() {
+  const tsvPath = path.join(__dirname, "..", "data", "usgs-invasive.tsv");
+
+  if (!fs.existsSync(tsvPath)) {
+    console.warn("data/usgs-invasive.tsv not found — skipping invasive backfill.");
+    return;
+  }
+
+  console.log("Parsing USGS invasive species list...");
+  const raw = fs.readFileSync(tsvPath, "utf-8");
+  const lines = raw.split("\n");
+  const invasiveNames: string[] = [];
+
+  for (let i = 1; i < lines.length; i++) {
+    const line = lines[i].trim();
+    if (!line) continue;
+    const [name, flag] = line.split("\t");
+    if (flag === "true" && name) invasiveNames.push(name);
+  }
+
+  console.log(`Found ${invasiveNames.length} invasive plant species. Updating database...`);
+
+  const BATCH = 500;
+  let updated = 0;
+
+  for (let i = 0; i < invasiveNames.length; i += BATCH) {
+    const batch = invasiveNames.slice(i, i + BATCH);
+    const result = await sql`
+      UPDATE plants SET invasive = true, updated_at = NOW()
+      WHERE scientific_name ILIKE ANY(${batch})
+      AND invasive = false
+    `;
+    updated += result.count;
+  }
+
+  console.log(`Invasive backfill complete — ${updated} plants flagged as invasive.`);
+}
+
 async function seed() {
   await seedCurated();
   await seedFromCSV();
+  await backfillInvasive();
 
   const [{ count }] = await sql<[{ count: string }]>`SELECT COUNT(*) FROM plants`;
   console.log(`Total plants in database: ${count}`);
