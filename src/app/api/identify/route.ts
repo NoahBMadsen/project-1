@@ -158,7 +158,7 @@ export async function POST(request: Request) {
 
       const newName = usdaMatch?.scientific_name ?? scientificName;
       const newCommon = usdaMatch?.common_name ?? commonNames[0] ?? null;
-      const newFamily = usdaMatch?.family ?? family || null;
+      const newFamily = usdaMatch?.family ?? (family || null);
 
       const inserted = await sql`
         INSERT INTO plants (scientific_name, common_name, family)
