@@ -5,8 +5,10 @@ export async function middleware(request: NextRequest) {
   // Only run auth logic on protected routes — avoids crashing on static/public pages
   const isProtected =
     request.nextUrl.pathname.startsWith("/dashboard") ||
+    request.nextUrl.pathname.startsWith("/map") ||
     request.nextUrl.pathname.startsWith("/journal") ||
-    request.nextUrl.pathname.startsWith("/scan");
+    request.nextUrl.pathname.startsWith("/scan") ||
+    request.nextUrl.pathname.startsWith("/plants");
 
   let supabaseResponse = NextResponse.next({ request });
 

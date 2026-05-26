@@ -1,312 +1,375 @@
 "use client";
 
-import { useRef, useState } from "react";
-import Link from "next/link";
-import { Camera, Leaf, ArrowLeft, Upload, Loader2, AlertCircle } from "lucide-react";
+import { useState, useRef, useCallback, useEffect } from "react";
+import { Camera, RotateCcw, Loader2, BookOpen, MapPin } from "lucide-react";
 
-interface PlantResult {
-  scientificName: string;
-  commonName: string | null;
-  confidence: number;
+interface IdentifyResult {
+  identification: {
+    scientificName: string;
+    commonNames: string[];
+    family: string;
+    score: number;
+    relatedImage: string | null;
+  };
   plant: {
     id: string;
+    common_name: string;
     scientific_name: string;
-    common_name: string | null;
     edible: boolean;
     medicinal: boolean;
     toxic: boolean;
     invasive: boolean;
-    safety_notes: string | null;
-    edibility_notes: string | null;
-    image_url: string | null;
+    safety_notes: string;
+    edibility_notes: string;
+    native_range: string;
   } | null;
-  alternatives: {
-    scientificName: string;
-    commonName: string | null;
-    confidence: number;
-  }[];
 }
 
-const BADGE_CONFIG = [
-  { key: "edible", label: "Edible", classes: "bg-emerald-100 text-emerald-800" },
-  { key: "medicinal", label: "Medicinal", classes: "bg-blue-100 text-blue-800" },
-  { key: "toxic", label: "Toxic", classes: "bg-red-100 text-red-800" },
-  { key: "invasive", label: "Invasive", classes: "bg-amber-100 text-amber-800" },
-] as const;
+type ScanState = "camera" | "identifying" | "result";
 
 export default function ScanPage() {
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const [preview, setPreview] = useState<string | null>(null);
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState<PlantResult | null>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+
+  const [state, setState] = useState<ScanState>("camera");
+  const [saving, setSaving] = useState(false);
+  const [result, setResult] = useState<IdentifyResult | null>(null);
+  const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [notes, setNotes] = useState("");
+  const [shareToMap, setShareToMap] = useState(true);
+  const [saved, setSaved] = useState(false);
+  const [userLocation, setUserLocation] = useState<{
+    lat: number;
+    lng: number;
+  } | null>(null);
 
-  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setSelectedFile(file);
-    setResult(null);
+  const startCamera = useCallback(async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: "environment", width: { ideal: 1280 } },
+      });
+      streamRef.current = stream;
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+      }
+    } catch {
+      setError(
+        "Camera access denied. Please allow camera permissions to scan plants."
+      );
+    }
+  }, []);
+
+  const stopCamera = useCallback(() => {
+    streamRef.current?.getTracks().forEach((t) => t.stop());
+    streamRef.current = null;
+  }, []);
+
+  useEffect(() => {
+    startCamera();
+    navigator.geolocation.getCurrentPosition(
+      (pos) =>
+        setUserLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+      () => {}
+    );
+    return () => stopCamera();
+  }, [startCamera, stopCamera]);
+
+  const capture = async () => {
+    const video = videoRef.current;
+    const canvas = canvasRef.current;
+    if (!video || !canvas) return;
+
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+    ctx.drawImage(video, 0, 0);
+
+    setCapturedImage(canvas.toDataURL("image/jpeg", 0.85));
+    stopCamera();
+    setState("identifying");
     setError(null);
-    const url = URL.createObjectURL(file);
-    setPreview(url);
-  }
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    if (!selectedFile) return;
+    canvas.toBlob(
+      async (blob) => {
+        if (!blob) {
+          setError("Failed to capture image");
+          setState("camera");
+          startCamera();
+          return;
+        }
 
-    setLoading(true);
-    setError(null);
-    setResult(null);
+        const formData = new FormData();
+        formData.append("image", blob, "scan.jpg");
+
+        try {
+          const res = await fetch("/api/identify", {
+            method: "POST",
+            body: formData,
+          });
+          const data = await res.json();
+          if (!res.ok) {
+            setError(data.error ?? "Identification failed");
+            setState("camera");
+            startCamera();
+            return;
+          }
+          setResult(data);
+          setState("result");
+        } catch {
+          setError("Network error. Please try again.");
+          setState("camera");
+          startCamera();
+        }
+      },
+      "image/jpeg",
+      0.85
+    );
+  };
+
+  const saveToJournal = async () => {
+    if (!result) return;
+    setSaving(true);
 
     try {
-      const form = new FormData();
-      form.append("image", selectedFile);
+      const res = await fetch("/api/journal", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          plantId: result.plant?.id ?? null,
+          speciesName:
+            result.identification.commonNames[0] ??
+            result.identification.scientificName,
+          confidenceScore: result.identification.score,
+          latitude: userLocation?.lat ?? null,
+          longitude: userLocation?.lng ?? null,
+          notes: notes || null,
+          shareToMap,
+        }),
+      });
 
-      const res = await fetch("/api/identify", { method: "POST", body: form });
-      const data = await res.json();
-
-      if (!res.ok) {
-        setError(data.error ?? "Something went wrong. Please try again.");
-        return;
-      }
-      setResult(data as PlantResult);
+      if (!res.ok) throw new Error("Save failed");
+      setSaved(true);
     } catch {
-      setError("Network error — check your connection and try again.");
+      setError("Failed to save. Please try again.");
     } finally {
-      setLoading(false);
+      setSaving(false);
     }
-  }
+  };
 
-  function resetScan() {
-    setPreview(null);
-    setSelectedFile(null);
+  const reset = () => {
+    setState("camera");
+    setSaving(false);
     setResult(null);
+    setCapturedImage(null);
     setError(null);
-    if (fileInputRef.current) fileInputRef.current.value = "";
-  }
+    setNotes("");
+    setSaved(false);
+    startCamera();
+  };
+
+  const confidence = result?.identification.score
+    ? Math.round(result.identification.score * 100)
+    : 0;
 
   return (
-    <div className="flex min-h-full flex-col bg-stone-50">
-      {/* Header */}
-      <header className="border-b border-stone-200 bg-white">
-        <div className="mx-auto flex max-w-2xl items-center gap-4 px-6 py-4">
-          <Link
-            href="/map"
-            className="flex items-center gap-1.5 text-sm text-stone-500 hover:text-stone-700"
-          >
-            <ArrowLeft className="size-4" />
-            Map
-          </Link>
-          <div className="flex items-center gap-2 ml-auto">
-            <Leaf className="size-5 text-emerald-600" />
-            <span className="font-semibold text-stone-900">Scan a Plant</span>
-          </div>
+    <div className="mx-auto w-full max-w-lg px-4 py-4">
+      {error && (
+        <div className="mb-4 rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">
+          {error}
         </div>
-      </header>
+      )}
 
-      <main className="mx-auto w-full max-w-2xl flex-1 px-6 py-10">
-        {!result ? (
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Image capture area */}
-            <div
-              className="relative flex min-h-64 cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-stone-300 bg-white transition hover:border-emerald-400 hover:bg-emerald-50/30"
-              onClick={() => fileInputRef.current?.click()}
-            >
-              {preview ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={preview}
-                  alt="Plant preview"
-                  className="max-h-72 w-full rounded-2xl object-contain"
-                />
-              ) : (
-                <div className="flex flex-col items-center gap-3 p-8 text-center">
-                  <div className="flex size-14 items-center justify-center rounded-full bg-emerald-100">
-                    <Camera className="size-7 text-emerald-600" />
-                  </div>
-                  <p className="text-base font-medium text-stone-700">
-                    Take a photo or choose from your library
-                  </p>
-                  <p className="text-sm text-stone-400">
-                    Point at leaves, flowers, fruit, or bark for best results
-                  </p>
-                </div>
-              )}
-            </div>
-
-            {/* Hidden file input — opens camera on mobile */}
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              capture="environment"
-              className="hidden"
-              onChange={handleFileChange}
+      {(state === "camera" || state === "identifying") && (
+        <div className="overflow-hidden rounded-2xl bg-black">
+          <div className="relative aspect-[3/4]">
+            <video
+              ref={videoRef}
+              autoPlay
+              playsInline
+              muted
+              className={`h-full w-full object-cover ${state === "identifying" ? "opacity-50" : ""}`}
             />
 
-            {/* Error */}
-            {error && (
-              <div className="flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-                <AlertCircle className="mt-0.5 size-4 shrink-0" />
-                {error}
+            {state === "identifying" && (
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="flex flex-col items-center gap-3 rounded-2xl bg-black/60 px-6 py-4">
+                  <Loader2 className="size-8 animate-spin text-emerald-400" />
+                  <p className="text-sm text-white">Identifying plant...</p>
+                </div>
               </div>
             )}
 
-            {/* Actions */}
-            <div className="flex gap-3">
-              {preview && (
+            {state === "camera" && (
+              <div className="absolute inset-x-0 bottom-0 flex justify-center p-6">
                 <button
-                  type="button"
-                  onClick={resetScan}
-                  className="flex-1 rounded-xl border border-stone-200 bg-white px-4 py-3 text-sm font-medium text-stone-600 transition hover:bg-stone-50"
+                  onClick={capture}
+                  className="flex size-16 items-center justify-center rounded-full bg-white shadow-lg transition active:scale-95"
                 >
-                  Retake
+                  <Camera className="size-7 text-stone-700" />
                 </button>
-              )}
-              <button
-                type="submit"
-                disabled={!selectedFile || loading}
-                className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-3 text-sm font-medium text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                {loading ? (
-                  <>
-                    <Loader2 className="size-4 animate-spin" />
-                    Identifying…
-                  </>
-                ) : (
-                  <>
-                    <Upload className="size-4" />
-                    {selectedFile ? "Identify Plant" : "Choose a Photo First"}
-                  </>
-                )}
-              </button>
-            </div>
-          </form>
-        ) : (
-          /* Result */
-          <div className="space-y-5">
-            {/* Top match card */}
-            <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-wider text-emerald-600">
-                    Best Match
-                  </p>
-                  <h1 className="mt-1 text-xl font-bold text-stone-900">
-                    {result.commonName ?? result.scientificName}
-                  </h1>
-                  <p className="mt-0.5 text-sm italic text-stone-500">
-                    {result.scientificName}
-                  </p>
-                </div>
-                {/* Confidence badge */}
-                <div className="shrink-0 rounded-full bg-emerald-50 px-3 py-1.5 text-center">
-                  <p className="text-lg font-bold text-emerald-700">
-                    {Math.round(result.confidence * 100)}%
-                  </p>
-                  <p className="text-xs text-emerald-600">confidence</p>
-                </div>
               </div>
+            )}
+          </div>
+        </div>
+      )}
 
-              {/* Category badges */}
-              {result.plant && (
-                <div className="mt-4 flex flex-wrap gap-2">
-                  {BADGE_CONFIG.map(({ key, label, classes }) =>
-                    result.plant![key] ? (
-                      <span
-                        key={key}
-                        className={`rounded-full px-3 py-1 text-xs font-semibold ${classes}`}
-                      >
-                        {label}
-                      </span>
-                    ) : null
-                  )}
-                  {!BADGE_CONFIG.some(({ key }) => result.plant![key]) && (
-                    <span className="rounded-full bg-stone-100 px-3 py-1 text-xs font-medium text-stone-500">
-                      No category data yet
-                    </span>
-                  )}
-                </div>
-              )}
+      <canvas ref={canvasRef} className="hidden" />
 
-              {/* Safety / edibility notes */}
-              {result.plant?.safety_notes && (
-                <div className="mt-4 rounded-xl border border-red-100 bg-red-50 px-4 py-3">
-                  <p className="text-xs font-semibold uppercase tracking-wider text-red-600">
-                    Safety
-                  </p>
-                  <p className="mt-1 text-sm text-red-800">
-                    {result.plant.safety_notes}
-                  </p>
-                </div>
-              )}
-              {result.plant?.edibility_notes && (
-                <div className="mt-3 rounded-xl border border-emerald-100 bg-emerald-50 px-4 py-3">
-                  <p className="text-xs font-semibold uppercase tracking-wider text-emerald-600">
-                    Edibility
-                  </p>
-                  <p className="mt-1 text-sm text-emerald-800">
-                    {result.plant.edibility_notes}
-                  </p>
-                </div>
-              )}
+      {state === "result" && result && (
+        <div className="space-y-4">
+          {capturedImage && (
+            <div className="overflow-hidden rounded-2xl">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={capturedImage}
+                alt="Captured plant"
+                className="w-full"
+              />
+            </div>
+          )}
 
-              {!result.plant && (
-                <p className="mt-4 text-sm text-stone-400">
-                  This species isn&apos;t in the Bramble database yet.
+          <div className="rounded-2xl border border-stone-200 bg-white p-5">
+            <div className="flex items-start justify-between">
+              <div>
+                <h2 className="text-xl font-bold text-stone-900">
+                  {result.identification.commonNames[0] ??
+                    result.identification.scientificName}
+                </h2>
+                <p className="text-sm italic text-stone-500">
+                  {result.identification.scientificName}
                 </p>
+                <p className="text-xs text-stone-400">
+                  {result.identification.family}
+                </p>
+              </div>
+              <div
+                className={`rounded-full px-3 py-1 text-sm font-semibold ${
+                  confidence >= 70
+                    ? "bg-emerald-100 text-emerald-700"
+                    : confidence >= 40
+                      ? "bg-amber-100 text-amber-700"
+                      : "bg-red-100 text-red-700"
+                }`}
+              >
+                {confidence}%
+              </div>
+            </div>
+
+            <div className="mt-4 flex flex-wrap gap-2">
+              {result.plant?.edible && (
+                <span className="rounded-full bg-green-100 px-3 py-1 text-xs font-medium text-green-700">
+                  Edible
+                </span>
+              )}
+              {result.plant?.medicinal && (
+                <span className="rounded-full bg-blue-100 px-3 py-1 text-xs font-medium text-blue-700">
+                  Medicinal
+                </span>
+              )}
+              {result.plant?.toxic && (
+                <span className="rounded-full bg-red-100 px-3 py-1 text-xs font-medium text-red-700">
+                  Toxic - Use Caution
+                </span>
+              )}
+              {result.plant?.invasive && (
+                <span className="rounded-full bg-orange-100 px-3 py-1 text-xs font-medium text-orange-700">
+                  Invasive Species
+                </span>
               )}
             </div>
 
-            {/* Alternative matches */}
-            {result.alternatives.length > 0 && (
-              <div className="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm">
-                <p className="text-sm font-semibold text-stone-700">
-                  Other possible matches
+            {result.plant?.safety_notes && (
+              <div className="mt-4 rounded-xl bg-amber-50 p-3">
+                <p className="text-xs font-semibold text-amber-800">
+                  Safety Info
                 </p>
-                <ul className="mt-3 divide-y divide-stone-100">
-                  {result.alternatives.map((alt) => (
-                    <li
-                      key={alt.scientificName}
-                      className="flex items-center justify-between py-2.5"
-                    >
-                      <div>
-                        <p className="text-sm font-medium text-stone-800">
-                          {alt.commonName ?? alt.scientificName}
-                        </p>
-                        <p className="text-xs italic text-stone-400">
-                          {alt.scientificName}
-                        </p>
-                      </div>
-                      <span className="text-sm font-medium text-stone-500">
-                        {Math.round(alt.confidence * 100)}%
-                      </span>
-                    </li>
-                  ))}
-                </ul>
+                <p className="mt-1 text-sm text-amber-700">
+                  {result.plant.safety_notes}
+                </p>
               </div>
             )}
 
-            {/* Actions */}
-            <div className="flex gap-3">
-              <button
-                onClick={resetScan}
-                className="flex-1 rounded-xl border border-stone-200 bg-white px-4 py-3 text-sm font-medium text-stone-600 transition hover:bg-stone-50"
-              >
-                Scan Another
-              </button>
-              <Link
-                href="/map"
-                className="flex flex-1 items-center justify-center rounded-xl bg-emerald-600 px-4 py-3 text-sm font-medium text-white transition hover:bg-emerald-700"
-              >
-                Back to Map
-              </Link>
-            </div>
+            {result.plant?.edibility_notes && (
+              <div className="mt-3 rounded-xl bg-stone-50 p-3">
+                <p className="text-xs font-semibold text-stone-600">
+                  Edibility
+                </p>
+                <p className="mt-1 text-sm text-stone-600">
+                  {result.plant.edibility_notes}
+                </p>
+              </div>
+            )}
+
+            {result.plant?.native_range && (
+              <p className="mt-3 text-xs text-stone-400">
+                Native range: {result.plant.native_range}
+              </p>
+            )}
           </div>
-        )}
-      </main>
+
+          {!saved ? (
+            <div className="rounded-2xl border border-stone-200 bg-white p-5">
+              <h3 className="mb-3 text-sm font-semibold text-stone-700">
+                Save to Journal
+              </h3>
+
+              <textarea
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                placeholder="Add notes about this find (optional)..."
+                className="w-full resize-none rounded-xl border border-stone-200 bg-stone-50 px-4 py-3 text-sm text-stone-700 placeholder:text-stone-400 focus:border-emerald-300 focus:outline-none focus:ring-2 focus:ring-emerald-100"
+                rows={3}
+              />
+
+              <label className="mt-3 flex items-center gap-2 text-sm text-stone-600">
+                <input
+                  type="checkbox"
+                  checked={shareToMap}
+                  onChange={(e) => setShareToMap(e.target.checked)}
+                  className="size-4 rounded border-stone-300 text-emerald-600 focus:ring-emerald-500"
+                />
+                <MapPin className="size-4" />
+                Share location on community map
+              </label>
+
+              <button
+                onClick={saveToJournal}
+                disabled={saving}
+                className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-3 text-sm font-medium text-white transition hover:bg-emerald-700 disabled:opacity-50"
+              >
+                {saving ? (
+                  <Loader2 className="size-4 animate-spin" />
+                ) : (
+                  <BookOpen className="size-4" />
+                )}
+                Save to Journal
+              </button>
+            </div>
+          ) : (
+            <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-5 text-center">
+              <p className="font-medium text-emerald-700">
+                Saved to your journal!
+              </p>
+              {shareToMap && (
+                <p className="mt-1 text-sm text-emerald-600">
+                  Pinned on the community map
+                </p>
+              )}
+            </div>
+          )}
+
+          <button
+            onClick={reset}
+            className="flex w-full items-center justify-center gap-2 rounded-xl border border-stone-200 bg-white px-4 py-3 text-sm font-medium text-stone-600 transition hover:bg-stone-50"
+          >
+            <RotateCcw className="size-4" />
+            Scan Another Plant
+          </button>
+        </div>
+      )}
     </div>
   );
 }

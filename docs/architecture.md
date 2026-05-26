@@ -37,21 +37,96 @@
 | Role | Technology | Details |
 |---|---|---|
 | **ID engine** | Pl@ntNet API (free tier) | Receives a photo, returns a ranked species match with confidence score. Free tier: 500 identifications/day — sufficient for a capstone demo. If Bramble scales, Pro plan is €1,000/year. |
-| **Plant profile data** | USDA PLANTS database | One-time bulk data seeding into Supabase at project setup. Powers all browse, search, and filter features. Includes edibility/safety info, invasive/noxious flags, geolocation ranges, and common names. |
-| **Species name mapping** | Custom matching layer | Pl@ntNet returns a scientific species name. That name is matched against the seeded USDA records to pull the full plant profile — safety info, edibility category, invasive flag, images. This is how a camera scan connects to your searchable database. |
+| **Plant profile data** | USDA PLANTS database | Bulk CSV stored locally at `data/usda-plants.csv`. Used for initial database seeding and on-the-fly lookups when a scan identifies a species not yet in our DB. Provides scientific/common names, family, native range, and invasive/noxious flags. Does NOT include edibility or safety data - those come from curated seeds or the AI enrichment pipeline. |
+| **Species name mapping** | Custom matching layer | Pl@ntNet returns a scientific species name. That name is matched against Supabase records first. If no match, the local USDA CSV is checked and a new record is auto-inserted. This ensures every scan produces a plant record in the database. |
 | **Seed images** | USDA PLANTS / PlantNet-300K | One stock image per species stored in Supabase Storage. Used on plant cards and as the canonical map pin image for that species. |
 
 ### Data Flow: Camera Scan
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant ScanPage as /scan page
+    participant API as /api/identify
+    participant PlantNet as Pl@ntNet API
+    participant DB as Supabase DB
+    participant USDA as Local USDA CSV
+
+    User->>ScanPage: Opens camera, takes photo
+    ScanPage->>API: POST image as FormData
+    API->>PlantNet: Forward image for identification
+    PlantNet-->>API: Species name, confidence score, family
+    API->>DB: Look up scientific name in plants table
+    alt Plant exists in DB
+        DB-->>API: Full plant record (safety notes, flags)
+    else Plant NOT in DB
+        API->>USDA: Search local CSV by scientific name
+        USDA-->>API: Name, family, range, invasive flag
+        API->>DB: INSERT new plant (safety fields = NULL)
+        DB-->>API: New plant record
+    end
+    API-->>ScanPage: Combined result (ID + plant data)
+    ScanPage-->>User: Shows species, confidence %, badges, safety info
+    Note over ScanPage: If safety flags are NULL, shows "Not yet verified" warning
+    User->>ScanPage: Adds notes, checks "share to map", hits Save
+    ScanPage->>API: POST /api/journal (create entry + pin)
+    API->>DB: INSERT journal_entry + community_pin with GPS coords
+    ScanPage-->>User: "Saved to journal! Pinned on map."
 ```
-User takes photo
-    → Browser sends image to Pl@ntNet API
-    → Pl@ntNet returns: scientific name + confidence score
-    → App looks up scientific name in Supabase (USDA-seeded records)
-    → Returns: safety info, edibility, invasive flag, stock image
-    → Pre-fills journal entry with: plant name, date, GPS coordinates
-    → User can attach their own photo to the journal entry (stored in Supabase Storage)
-    → If plant is novel (not in DB), triggers Community Field Guide contribution flow
+
+### Data Source Matrix
+
+| Field | Pl@ntNet API | USDA CSV | Curated Seed (30 plants) | Future: AI Agent |
+|---|---|---|---|---|
+| Scientific name | Yes | Yes | Yes | - |
+| Common name | Yes | Yes | Yes | - |
+| Family | Yes | Yes | Yes | - |
+| Confidence score | Yes | - | - | - |
+| Related photo | Yes | - | - | - |
+| Native range | - | Yes | Yes | - |
+| Invasive flag | - | Yes | Yes | - |
+| Edible flag | - | - | Yes (hand-verified) | Yes (batch) |
+| Medicinal flag | - | - | Yes (hand-verified) | Yes (batch) |
+| Toxic flag | - | - | Yes (hand-verified) | Yes (batch) |
+| Safety notes | - | - | Yes (hand-verified) | Yes (batch) |
+| Edibility notes | - | - | Yes (hand-verified) | Yes (batch) |
+
+### Data Enrichment Pipeline
+
+Plant safety data flows through three tiers, from instant to eventually-verified:
+
+```mermaid
+flowchart TD
+    subgraph tier1 [Tier 1: Instant - On Scan]
+        Scan[User scans plant] --> PlantNet[Pl@ntNet identifies species]
+        PlantNet --> DBCheck{In our DB?}
+        DBCheck -->|Yes| ReturnFull[Return full record]
+        DBCheck -->|No| USDALookup[Search local USDA CSV]
+        USDALookup --> AutoInsert["INSERT into plants table\n(name, family, range, invasive)\nEdible/toxic/safety = NULL"]
+        AutoInsert --> ReturnPartial["Return partial record\n+ 'Not yet verified' warning"]
+    end
+
+    subgraph tier2 [Tier 2: Daily - AI Agent Batch]
+        DailyAgent[Scheduled AI agent] --> FindNulls["SELECT * FROM plants\nWHERE edible IS NULL"]
+        FindNulls --> Research["LLM researches each species\nagainst botanical sources"]
+        Research --> UpdateDB["UPDATE plants SET edible, toxic,\nmedicinal, safety_notes\nSET verified_by = 'ai-agent'"]
+    end
+
+    subgraph tier3 [Tier 3: Future - Human Review]
+        ReviewQueue[Human botanist review queue] --> VerifyFlags["Confirm or correct AI flags\nSET verified_by = 'human'"]
+    end
+
+    tier1 -.->|"Plants with NULL safety flags"| tier2
+    tier2 -.->|"Uncertain or high-risk species"| tier3
 ```
+
+**Tier 1 (instant):** Every scan returns a result. If the plant is new, we auto-insert from USDA data with NULL safety flags and show a "not yet verified" warning.
+
+**Tier 2 (daily batch):** A scheduled AI agent queries all plants with NULL safety flags, researches them against reliable botanical sources, and populates edible/medicinal/toxic flags and safety notes. Records are marked with `verified_by = 'ai-agent'` and `verified_at` timestamp.
+
+**Tier 3 (future):** For species the AI flags as uncertain or high-risk (e.g., toxic look-alikes), a human botanist review queue allows expert verification. Records upgraded to `verified_by = 'human'`.
+
+> **Schema note:** Future migration should add `verified_at TIMESTAMPTZ` and `verified_by VARCHAR` columns to the `plants` table to track data provenance.
 
 ### Map Pin Image Policy
 - **Map pins** always display the **seeded stock image** for the species (consistent, no per-user storage cost)
