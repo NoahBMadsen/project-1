@@ -1,5 +1,10 @@
 import "dotenv/config";
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
 import postgres from "postgres";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const DATABASE_URL = process.env.DATABASE_URL;
 if (!DATABASE_URL) {
@@ -426,8 +431,98 @@ const plants: PlantSeed[] = [
   },
 ];
 
-async function seed() {
-  console.log(`Seeding ${plants.length} plants...`);
+// ---------------------------------------------------------------------------
+// Helpers for USDA CSV parsing
+// ---------------------------------------------------------------------------
+
+/**
+ * Strip taxonomic authority from a USDA "Scientific Name with Author" string.
+ * e.g. "Abutilon abutiloides (Jacq.) Garcke ex Hochr." → "Abutilon abutiloides"
+ *      "Abies balsamea (L.) Mill. var. balsamea"        → "Abies balsamea var. balsamea"
+ */
+function extractTaxonName(fullName: string): string {
+  // Remove parenthetical author citations first
+  const stripped = fullName.replace(/\s*\([^)]*\)/g, "").trim();
+  const parts = stripped.split(/\s+/);
+  if (parts.length === 0) return "";
+
+  const result: string[] = [parts[0]]; // Genus (always first)
+  const rankMarkers = new Set(["var.", "subsp.", "ssp.", "f.", "subf.", "cv."]);
+
+  for (let i = 1; i < parts.length; i++) {
+    const word = parts[i];
+    if (word.length > 0 && (word[0] === word[0].toLowerCase() || rankMarkers.has(word))) {
+      result.push(word);
+    } else {
+      break; // Hit an uppercase author abbreviation — stop
+    }
+  }
+
+  // Require at least genus + species epithet
+  return result.length >= 2 ? result.join(" ") : "";
+}
+
+interface USDARow {
+  scientific_name: string;
+  common_name: string | null;
+  family: string | null;
+}
+
+function parseUSDACSV(filePath: string): USDARow[] {
+  const raw = fs.readFileSync(filePath, "utf-8");
+  const lines = raw.split("\n");
+
+  // Skip header row
+  const seen = new Map<string, USDARow>();
+
+  for (let i = 1; i < lines.length; i++) {
+    const line = lines[i].trim();
+    if (!line) continue;
+
+    // Parse quoted CSV: "val","val","val","val","val"
+    const cols: string[] = [];
+    let inQuote = false;
+    let current = "";
+    for (const ch of line) {
+      if (ch === '"') {
+        inQuote = !inQuote;
+      } else if (ch === "," && !inQuote) {
+        cols.push(current);
+        current = "";
+      } else {
+        current += ch;
+      }
+    }
+    cols.push(current);
+
+    if (cols.length < 5) continue;
+
+    const synonymSymbol = cols[1].trim();
+    // Skip synonym rows — only import accepted names
+    if (synonymSymbol !== "") continue;
+
+    const fullName = cols[2].trim();
+    const commonName = cols[3].trim() || null;
+    const family = cols[4].trim() || null;
+
+    const scientificName = extractTaxonName(fullName);
+    if (!scientificName) continue;
+
+    // Keep first occurrence if duplicates after author-stripping
+    if (!seen.has(scientificName)) {
+      seen.set(scientificName, { scientific_name: scientificName, common_name: commonName, family });
+    }
+  }
+
+  return Array.from(seen.values());
+}
+
+// ---------------------------------------------------------------------------
+// Seed functions
+// ---------------------------------------------------------------------------
+
+async function seedCurated() {
+  console.log(`Seeding ${plants.length} curated plants...`);
 
   for (const plant of plants) {
     await sql`
@@ -454,7 +549,47 @@ async function seed() {
     `;
   }
 
-  console.log("Done seeding plants.");
+  console.log(`Done — ${plants.length} curated plants seeded.`);
+}
+
+async function seedFromCSV() {
+  const csvPath = path.join(__dirname, "..", "data", "usda-plants.csv");
+
+  if (!fs.existsSync(csvPath)) {
+    console.warn("data/usda-plants.csv not found — skipping USDA bulk import.");
+    return;
+  }
+
+  console.log("Parsing USDA CSV...");
+  const rows = parseUSDACSV(csvPath);
+  console.log(`Parsed ${rows.length} accepted species. Bulk inserting in batches of 500...`);
+
+  const BATCH = 500;
+  let inserted = 0;
+
+  for (let i = 0; i < rows.length; i += BATCH) {
+    const batch = rows.slice(i, i + BATCH);
+    await sql`
+      INSERT INTO plants ${sql(batch, "scientific_name", "common_name", "family")}
+      ON CONFLICT (scientific_name) DO UPDATE SET
+        common_name = COALESCE(EXCLUDED.common_name, plants.common_name),
+        family     = COALESCE(EXCLUDED.family, plants.family),
+        updated_at = NOW()
+    `;
+    inserted += batch.length;
+    process.stdout.write(`\r  ${inserted} / ${rows.length}`);
+  }
+
+  console.log(`\nUSDA bulk import complete — ${inserted} rows upserted.`);
+}
+
+async function seed() {
+  await seedCurated();
+  await seedFromCSV();
+
+  const [{ count }] = await sql<[{ count: string }]>`SELECT COUNT(*) FROM plants`;
+  console.log(`Total plants in database: ${count}`);
+
   await sql.end();
 }
 
