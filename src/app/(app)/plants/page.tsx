@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { Search, Loader2, MapPin } from "lucide-react";
+
 import { useLocation } from "@/components/location-provider";
 import { PlantImage } from "@/components/plant-image";
 
@@ -18,6 +19,7 @@ interface Plant {
   safety_notes: string | null;
   edibility_notes: string | null;
   image_url: string | null;
+  spotted_nearby: boolean;
 }
 
 const categories = [
@@ -35,14 +37,13 @@ export default function PlantsPage() {
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("all");
   const [expanded, setExpanded] = useState<string | null>(null);
-  const [nearbyOnly, setNearbyOnly] = useState(true);
 
   const fetchPlants = useCallback(async () => {
     setLoading(true);
     const params = new URLSearchParams();
     if (query) params.set("q", query);
     if (category !== "all") params.set("category", category);
-    if (nearbyOnly && userLat != null && userLng != null) {
+    if (userLat != null && userLng != null) {
       params.set("lat", String(userLat));
       params.set("lng", String(userLng));
       params.set("radius", String(radiusMiles));
@@ -56,7 +57,7 @@ export default function PlantsPage() {
       setPlants([]);
     }
     setLoading(false);
-  }, [query, category, nearbyOnly, userLat, userLng, radiusMiles]);
+  }, [query, category, userLat, userLng, radiusMiles]);
 
   useEffect(() => {
     const timer = setTimeout(fetchPlants, 300);
@@ -93,20 +94,6 @@ export default function PlantsPage() {
           </button>
         ))}
       </div>
-
-      {userLat != null && (
-        <button
-          onClick={() => setNearbyOnly(!nearbyOnly)}
-          className={`mb-6 flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition ${
-            nearbyOnly
-              ? "bg-emerald-100 text-emerald-700"
-              : "border border-stone-200 bg-white text-stone-500"
-          }`}
-        >
-          <MapPin className="size-3" />
-          {nearbyOnly ? `Nearby (${radiusMiles} mi)` : "All plants"}
-        </button>
-      )}
 
       {loading ? (
         <div className="flex h-40 items-center justify-center">
@@ -149,6 +136,12 @@ export default function PlantsPage() {
               </div>
 
               <div className="mt-2 flex flex-wrap gap-1.5">
+                {plant.spotted_nearby && (
+                  <span className="flex items-center gap-1 rounded bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700">
+                    <MapPin className="size-3" />
+                    Spotted nearby
+                  </span>
+                )}
                 {plant.edible && (
                   <span className="rounded bg-green-100 px-2 py-0.5 text-xs text-green-700">
                     Edible

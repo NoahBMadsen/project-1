@@ -44,29 +44,34 @@ export async function GET(request: Request) {
 
   let rows;
 
-  if (hasLocation) {
+  if (hasLocation && !isNaN(lat) && !isNaN(lng)) {
+    const point = `SRID=4326;POINT(${lng} ${lat})`;
     rows = await sql`
-      SELECT DISTINCT ON (p.common_name, p.id)
+      SELECT
         p.id, p.scientific_name, p.common_name, p.family,
         p.edible, p.medicinal, p.toxic, p.invasive,
-        p.native_range, p.safety_notes, p.edibility_notes, p.image_url
+        p.native_range, p.safety_notes, p.edibility_notes, p.image_url,
+        CASE WHEN cp.id IS NOT NULL THEN true ELSE false END as spotted_nearby
       FROM plants p
-      INNER JOIN community_pins cp ON cp.plant_id = p.id
-      ${whereClause}
-        ${conditions.length > 0 ? sql`AND` : sql`WHERE`}
-        ST_DWithin(
-          cp.location,
-          ST_GeogFromText(${`SRID=4326;POINT(${lng} ${lat})`}),
+      LEFT JOIN (
+        SELECT DISTINCT ON (plant_id) plant_id, id
+        FROM community_pins
+        WHERE ST_DWithin(
+          location,
+          ST_GeogFromText(${point}),
           ${radiusMeters}
         )
-      ORDER BY p.common_name ASC, p.id
+      ) cp ON cp.plant_id = p.id
+      ${whereClause}
+      ORDER BY spotted_nearby DESC, p.common_name ASC
       LIMIT 100
     `;
   } else {
     rows = await sql`
       SELECT p.id, p.scientific_name, p.common_name, p.family,
         p.edible, p.medicinal, p.toxic, p.invasive,
-        p.native_range, p.safety_notes, p.edibility_notes, p.image_url
+        p.native_range, p.safety_notes, p.edibility_notes, p.image_url,
+        false as spotted_nearby
       FROM plants p
       ${whereClause}
       ORDER BY p.common_name ASC
