@@ -1,98 +1,113 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import postgres from "postgres";
 
-const PLANTNET_URL = "https://my-api.plantnet.org/v2/identify/all";
-
-interface PlantNetResult {
-  score: number;
-  species: {
-    scientificNameWithoutAuthor: string;
-    commonNames: string[];
-    family: { scientificNameWithoutAuthor: string };
-  };
-}
+const sql = postgres(process.env.DATABASE_URL!);
 
 export async function POST(request: Request) {
-  const apiKey = process.env.PLANTNET_API_KEY;
-  if (!apiKey) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const PLANTNET_API_KEY = process.env.PLANTNET_API_KEY;
+  if (!PLANTNET_API_KEY) {
     return NextResponse.json(
-      { error: "PLANTNET_API_KEY is not configured on the server." },
+      { error: "Pl@ntNet API key not configured" },
       { status: 500 }
     );
   }
 
-  let imageFile: File | null = null;
   try {
-    const form = await request.formData();
-    imageFile = form.get("image") as File | null;
-  } catch {
-    return NextResponse.json({ error: "Invalid form data." }, { status: 400 });
-  }
+    const formData = await request.formData();
+    const image = formData.get("image") as File | null;
 
-  if (!imageFile || imageFile.size === 0) {
-    return NextResponse.json({ error: "No image provided." }, { status: 400 });
-  }
+    if (!image) {
+      return NextResponse.json({ error: "No image provided" }, { status: 400 });
+    }
 
-  // Forward image to Pl@ntNet
-  const plantnetForm = new FormData();
-  plantnetForm.append("images", imageFile);
-  plantnetForm.append("organs", "auto");
+    const plantnetForm = new FormData();
+    plantnetForm.append("images", image);
+    plantnetForm.append("organs", "auto");
 
-  let plantnetRes: Response;
-  try {
-    plantnetRes = await fetch(
-      `${PLANTNET_URL}?api-key=${apiKey}&lang=en&nb-results=5`,
+    const plantnetRes = await fetch(
+      `https://my-api.plantnet.org/v2/identify/all?include-related-images=true&nb-results=3&lang=en&api-key=${PLANTNET_API_KEY}`,
       { method: "POST", body: plantnetForm }
     );
+
+    if (!plantnetRes.ok) {
+      const errText = await plantnetRes.text();
+      console.error("Pl@ntNet error:", plantnetRes.status, errText);
+      return NextResponse.json(
+        {
+          error:
+            plantnetRes.status === 404
+              ? "Could not identify this plant. Try a clearer photo."
+              : "Plant identification service error",
+        },
+        { status: plantnetRes.status === 404 ? 404 : 502 }
+      );
+    }
+
+    const plantnetData = await plantnetRes.json();
+    const topResult = plantnetData.results?.[0];
+
+    if (!topResult) {
+      return NextResponse.json(
+        { error: "No identification results" },
+        { status: 404 }
+      );
+    }
+
+    const scientificName =
+      topResult.species?.scientificNameWithoutAuthor ?? "";
+    const commonNames: string[] = topResult.species?.commonNames ?? [];
+    const family =
+      topResult.species?.family?.scientificNameWithoutAuthor ?? "";
+    const score: number = topResult.score ?? 0;
+
+    const relatedImage =
+      topResult.images?.[0]?.url?.m ?? topResult.images?.[0]?.url?.s ?? null;
+
+    const dbRows = await sql`
+      SELECT * FROM plants
+      WHERE scientific_name ILIKE ${scientificName}
+      LIMIT 1
+    `;
+    const dbPlant = dbRows[0] ?? null;
+
+    return NextResponse.json({
+      identification: {
+        scientificName,
+        commonNames,
+        family,
+        score,
+        relatedImage,
+      },
+      plant: dbPlant,
+      allResults: plantnetData.results.slice(0, 3).map(
+        (r: {
+          score: number;
+          species: {
+            scientificNameWithoutAuthor: string;
+            commonNames: string[];
+          };
+        }) => ({
+          score: r.score,
+          scientificName: r.species?.scientificNameWithoutAuthor,
+          commonNames: r.species?.commonNames,
+        })
+      ),
+    });
   } catch (err) {
+    console.error("Identify error:", err);
     return NextResponse.json(
-      { error: "Failed to reach Pl@ntNet API.", detail: String(err) },
-      { status: 502 }
+      { error: "Internal server error" },
+      { status: 500 }
     );
   }
-
-  if (!plantnetRes.ok) {
-    const detail = await plantnetRes.text();
-    return NextResponse.json(
-      { error: `Pl@ntNet returned ${plantnetRes.status}.`, detail },
-      { status: 502 }
-    );
-  }
-
-  const plantnetData = await plantnetRes.json();
-  const results: PlantNetResult[] = plantnetData.results ?? [];
-  const top = results[0];
-
-  if (!top) {
-    return NextResponse.json(
-      { error: "Pl@ntNet could not identify any plant in this image." },
-      { status: 422 }
-    );
-  }
-
-  const scientificName = top.species.scientificNameWithoutAuthor;
-  const confidence = top.score;
-  const commonNamesFromApi = top.species.commonNames ?? [];
-
-  // Look up plant record in Supabase by scientific name
-  const supabase = await createClient();
-  const { data: plant } = await supabase
-    .from("plants")
-    .select(
-      "id, scientific_name, common_name, edible, medicinal, toxic, invasive, safety_notes, edibility_notes, image_url"
-    )
-    .ilike("scientific_name", scientificName)
-    .maybeSingle();
-
-  return NextResponse.json({
-    scientificName,
-    commonName: plant?.common_name ?? commonNamesFromApi[0] ?? null,
-    confidence,
-    plant: plant ?? null,
-    alternatives: results.slice(1, 4).map((r) => ({
-      scientificName: r.species.scientificNameWithoutAuthor,
-      commonName: r.species.commonNames[0] ?? null,
-      confidence: r.score,
-    })),
-  });
 }

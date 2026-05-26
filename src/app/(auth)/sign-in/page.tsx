@@ -6,7 +6,7 @@ import { Suspense, useState } from "react";
 
 function SignInForm() {
   const searchParams = useSearchParams();
-  const next = searchParams.get("next") ?? "/dashboard";
+  const next = searchParams.get("next") ?? "/map";
   const urlError = searchParams.get("error");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(urlError);
