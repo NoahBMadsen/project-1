@@ -1,8 +1,80 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import fs from "fs";
+import path from "path";
 import postgres from "postgres";
 
 const sql = postgres(process.env.DATABASE_URL!);
+
+interface USDAEntry {
+  scientific_name: string;
+  common_name: string | null;
+  family: string | null;
+}
+
+let usdaCache: Map<string, USDAEntry> | null = null;
+
+function getUSDALookup(): Map<string, USDAEntry> {
+  if (usdaCache) return usdaCache;
+
+  usdaCache = new Map();
+  const csvPath = path.join(process.cwd(), "data", "usda-plants.csv");
+  if (!fs.existsSync(csvPath)) return usdaCache;
+
+  const raw = fs.readFileSync(csvPath, "utf-8");
+  const lines = raw.split("\n");
+
+  for (let i = 1; i < lines.length; i++) {
+    const line = lines[i].trim();
+    if (!line) continue;
+
+    const cols: string[] = [];
+    let inQuote = false;
+    let current = "";
+    for (const ch of line) {
+      if (ch === '"') {
+        inQuote = !inQuote;
+      } else if (ch === "," && !inQuote) {
+        cols.push(current);
+        current = "";
+      } else {
+        current += ch;
+      }
+    }
+    cols.push(current);
+
+    if (cols.length < 5) continue;
+    if (cols[1].trim() !== "") continue;
+
+    const fullName = cols[2].trim();
+    const stripped = fullName.replace(/\s*\([^)]*\)/g, "").trim();
+    const parts = stripped.split(/\s+/);
+    if (parts.length < 2) continue;
+
+    const rankMarkers = new Set(["var.", "subsp.", "ssp.", "f.", "subf.", "cv."]);
+    const result: string[] = [parts[0]];
+    for (let j = 1; j < parts.length; j++) {
+      const word = parts[j];
+      if (word.length > 0 && (word[0] === word[0].toLowerCase() || rankMarkers.has(word))) {
+        result.push(word);
+      } else {
+        break;
+      }
+    }
+    if (result.length < 2) continue;
+
+    const sciName = result.join(" ");
+    if (!usdaCache.has(sciName.toLowerCase())) {
+      usdaCache.set(sciName.toLowerCase(), {
+        scientific_name: sciName,
+        common_name: cols[3].trim() || null,
+        family: cols[4].trim() || null,
+      });
+    }
+  }
+
+  return usdaCache;
+}
 
 export async function POST(request: Request) {
   const supabase = await createClient();
@@ -78,7 +150,34 @@ export async function POST(request: Request) {
       WHERE scientific_name ILIKE ${scientificName}
       LIMIT 1
     `;
-    const dbPlant = dbRows[0] ?? null;
+    let dbPlant = dbRows[0] ?? null;
+
+    if (!dbPlant && scientificName) {
+      const usda = getUSDALookup();
+      const usdaMatch = usda.get(scientificName.toLowerCase());
+
+      const newName = usdaMatch?.scientific_name ?? scientificName;
+      const newCommon = usdaMatch?.common_name ?? commonNames[0] ?? null;
+      const newFamily = usdaMatch?.family ?? family || null;
+
+      const inserted = await sql`
+        INSERT INTO plants (scientific_name, common_name, family)
+        VALUES (${newName}, ${newCommon}, ${newFamily})
+        ON CONFLICT (scientific_name) DO NOTHING
+        RETURNING *
+      `;
+
+      if (inserted[0]) {
+        dbPlant = inserted[0];
+      } else {
+        const refetch = await sql`
+          SELECT * FROM plants
+          WHERE scientific_name ILIKE ${scientificName}
+          LIMIT 1
+        `;
+        dbPlant = refetch[0] ?? null;
+      }
+    }
 
     return NextResponse.json({
       identification: {
