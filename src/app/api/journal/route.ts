@@ -15,8 +15,13 @@ export async function GET() {
   }
 
   const rows = await sql`
-    SELECT je.*, p.common_name as plant_common_name, p.scientific_name as plant_scientific_name,
-           p.edible, p.medicinal, p.toxic, p.invasive, p.safety_notes
+    SELECT
+      je.id, je.user_id, je.plant_id, je.species_name,
+      je.confidence_score, je.notes, je.scanned_at,
+      ST_Y(je.location::geometry) as latitude,
+      ST_X(je.location::geometry) as longitude,
+      p.common_name as plant_common_name, p.scientific_name as plant_scientific_name,
+      p.edible, p.medicinal, p.toxic, p.invasive, p.safety_notes
     FROM journal_entries je
     LEFT JOIN plants p ON je.plant_id = p.id
     WHERE je.user_id = ${user.id}

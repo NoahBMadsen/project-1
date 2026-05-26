@@ -97,6 +97,7 @@ export default function ScanPage() {
         if (!blob) {
           setError("Failed to capture image");
           setState("camera");
+          startCamera();
           return;
         }
 

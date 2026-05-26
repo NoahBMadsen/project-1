@@ -53,13 +53,19 @@ function LocationTracker({
   const map = useMap();
 
   useEffect(() => {
-    map.locate({ setView: true, maxZoom: 13 });
-    map.on("locationfound", (e) => {
+    const onFound = (e: L.LocationEvent) => {
       onLocationFound(e.latlng.lat, e.latlng.lng);
-    });
-    map.on("locationerror", () => {
+    };
+    const onError = () => {
       onLocationError();
-    });
+    };
+    map.locate({ setView: true, maxZoom: 13 });
+    map.on("locationfound", onFound);
+    map.on("locationerror", onError);
+    return () => {
+      map.off("locationfound", onFound);
+      map.off("locationerror", onError);
+    };
   }, [map, onLocationFound, onLocationError]);
 
   return null;
