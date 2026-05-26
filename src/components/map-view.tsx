@@ -6,33 +6,37 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { useLocation } from "@/components/location-provider";
 
-const LEAF_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.9C15.5 4.9 20 7 20 7s2.1 4.5 .1 10.2A7 7 0 0 1 11 20"/><path d="M10 20.5c2-2.5 3-5 3.5-8.5"/></svg>`;
+const LEAF_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.9C15.5 4.9 20 7 20 7s2.1 4.5 .1 10.2A7 7 0 0 1 11 20"/><path d="M10 20.5c2-2.5 3-5 3.5-8.5"/></svg>`;
+
+const PIN_SIZE = 38;
+const PIN_BORDER = 3;
+const PIN_INNER = PIN_SIZE - PIN_BORDER * 2;
 
 function plantPinIcon(imageUrl: string | null, invasive: boolean): L.DivIcon {
-  const borderColor = invasive ? "#f97316" : "#16a34a";
-  const size = 36;
+  const border = invasive ? "#f97316" : "#16a34a";
 
-  const inner = imageUrl
-    ? `<img src="${imageUrl}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" onerror="this.outerHTML='${LEAF_SVG.replace(/'/g, "\\'")}'" />`
-    : LEAF_SVG;
-
-  const bg = imageUrl ? "transparent" : borderColor;
+  let inner: string;
+  if (imageUrl) {
+    inner = `<img src="${encodeURI(imageUrl)}" width="${PIN_INNER}" height="${PIN_INNER}" style="position:absolute;top:0;left:0;width:${PIN_INNER}px;height:${PIN_INNER}px;object-fit:cover;border-radius:50%;" onerror="this.style.display='none';this.nextSibling.style.display='block'" /><div style="display:none;width:${PIN_INNER}px;height:${PIN_INNER}px;background:${border};border-radius:50%;text-align:center;line-height:${PIN_INNER}px">${LEAF_SVG}</div>`;
+  } else {
+    inner = LEAF_SVG;
+  }
 
   return L.divIcon({
     className: "",
-    html: `<div style="width:${size}px;height:${size}px;border-radius:50%;border:3px solid ${borderColor};background:${bg};box-shadow:0 2px 6px rgba(0,0,0,0.3);overflow:hidden;display:flex;align-items:center;justify-content:center;">${inner}</div>`,
-    iconSize: [size, size],
-    iconAnchor: [size / 2, size / 2],
-    popupAnchor: [0, -(size / 2 + 4)],
+    html: `<div style="width:${PIN_SIZE}px;height:${PIN_SIZE}px;border-radius:50%;border:${PIN_BORDER}px solid ${border};background:${imageUrl ? '#e5e5e5' : border};box-shadow:0 2px 8px rgba(0,0,0,0.3);overflow:hidden;position:relative;text-align:center;line-height:${PIN_INNER}px">${inner}</div>`,
+    iconSize: [PIN_SIZE, PIN_SIZE],
+    iconAnchor: [PIN_SIZE / 2, PIN_SIZE / 2],
+    popupAnchor: [0, -(PIN_SIZE / 2 + 4)],
   });
 }
 
 const defaultIcon = L.divIcon({
   className: "",
-  html: `<div style="width:36px;height:36px;border-radius:50%;border:3px solid #16a34a;background:#16a34a;box-shadow:0 2px 6px rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;">${LEAF_SVG}</div>`,
-  iconSize: [36, 36],
-  iconAnchor: [18, 18],
-  popupAnchor: [0, -22],
+  html: `<div style="width:${PIN_SIZE}px;height:${PIN_SIZE}px;border-radius:50%;border:${PIN_BORDER}px solid #16a34a;background:#16a34a;box-shadow:0 2px 8px rgba(0,0,0,0.3);overflow:hidden;text-align:center;line-height:${PIN_INNER}px">${LEAF_SVG}</div>`,
+  iconSize: [PIN_SIZE, PIN_SIZE],
+  iconAnchor: [PIN_SIZE / 2, PIN_SIZE / 2],
+  popupAnchor: [0, -(PIN_SIZE / 2 + 4)],
 });
 
 L.Marker.prototype.options.icon = defaultIcon;

@@ -42,42 +42,47 @@ export async function GET(request: Request) {
       ? sql`WHERE ${conditions.reduce((a, b) => sql`${a} AND ${b}`)}`
       : sql``;
 
-  let rows;
+  try {
+    let rows;
 
-  if (hasLocation && !isNaN(lat) && !isNaN(lng)) {
-    const point = `SRID=4326;POINT(${lng} ${lat})`;
-    rows = await sql`
-      SELECT
-        p.id, p.scientific_name, p.common_name, p.family,
-        p.edible, p.medicinal, p.toxic, p.invasive,
-        p.native_range, p.safety_notes, p.edibility_notes, p.image_url,
-        CASE WHEN cp.id IS NOT NULL THEN true ELSE false END as spotted_nearby
-      FROM plants p
-      LEFT JOIN (
-        SELECT DISTINCT ON (plant_id) plant_id, id
-        FROM community_pins
-        WHERE ST_DWithin(
-          location,
-          ST_GeogFromText(${point}),
-          ${radiusMeters}
-        )
-      ) cp ON cp.plant_id = p.id
-      ${whereClause}
-      ORDER BY spotted_nearby DESC, p.common_name ASC
-      LIMIT 100
-    `;
-  } else {
-    rows = await sql`
-      SELECT p.id, p.scientific_name, p.common_name, p.family,
-        p.edible, p.medicinal, p.toxic, p.invasive,
-        p.native_range, p.safety_notes, p.edibility_notes, p.image_url,
-        false as spotted_nearby
-      FROM plants p
-      ${whereClause}
-      ORDER BY p.common_name ASC
-      LIMIT 100
-    `;
+    if (hasLocation && !isNaN(lat) && !isNaN(lng)) {
+      const point = `SRID=4326;POINT(${lng} ${lat})`;
+      rows = await sql`
+        SELECT
+          p.id, p.scientific_name, p.common_name, p.family,
+          p.edible, p.medicinal, p.toxic, p.invasive,
+          p.native_range, p.safety_notes, p.edibility_notes, p.image_url,
+          CASE WHEN cp.id IS NOT NULL THEN true ELSE false END as spotted_nearby
+        FROM plants p
+        LEFT JOIN (
+          SELECT DISTINCT ON (plant_id) plant_id, id
+          FROM community_pins
+          WHERE ST_DWithin(
+            location,
+            ST_GeogFromText(${point}),
+            ${radiusMeters}
+          )
+        ) cp ON cp.plant_id = p.id
+        ${whereClause}
+        ORDER BY (CASE WHEN cp.id IS NOT NULL THEN 0 ELSE 1 END), p.common_name ASC
+        LIMIT 100
+      `;
+    } else {
+      rows = await sql`
+        SELECT p.id, p.scientific_name, p.common_name, p.family,
+          p.edible, p.medicinal, p.toxic, p.invasive,
+          p.native_range, p.safety_notes, p.edibility_notes, p.image_url,
+          false as spotted_nearby
+        FROM plants p
+        ${whereClause}
+        ORDER BY p.common_name ASC
+        LIMIT 100
+      `;
+    }
+
+    return NextResponse.json({ plants: rows });
+  } catch (err) {
+    console.error("Plants query error:", err);
+    return NextResponse.json({ plants: [], error: "Query failed" }, { status: 500 });
   }
-
-  return NextResponse.json({ plants: rows });
 }
