@@ -152,12 +152,12 @@ export default function PlantsPage() {
         />
       </div>
 
-      <div className="mb-4 flex items-center gap-2 overflow-x-auto">
+      <div className="mb-4 flex items-center gap-1.5">
         {categories.map((cat) => (
           <button
             key={cat.key}
             onClick={() => setCategory(cat.key)}
-            className={`shrink-0 rounded-full px-4 py-1.5 text-xs font-medium transition ${
+            className={`rounded-full px-3 py-1 text-xs font-medium transition ${
               category === cat.key
                 ? "bg-emerald-600 text-white"
                 : "border border-stone-200 bg-white text-stone-600 hover:bg-stone-50"
