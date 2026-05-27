@@ -36,40 +36,49 @@ async function fetchPlantNetImage(scientificName: string): Promise<string | null
 }
 
 export async function POST(request: Request) {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
-  const body = await request.json();
-  const { id, scientific_name } = body as { id: string; scientific_name: string };
-
-  if (!id || !scientific_name) {
-    return NextResponse.json({ error: "Missing id or scientific_name" }, { status: 400 });
-  }
-
-  const existing = await sql`SELECT image_url FROM plants WHERE id = ${id}`;
-  if (existing[0]?.image_url) {
-    return NextResponse.json({ image_url: existing[0].image_url });
-  }
-
-  let imageUrl = await fetchWikipediaImage(scientific_name);
-
-  if (!imageUrl) {
-    const parts = scientific_name.split(" ");
-    if (parts.length >= 2) {
-      imageUrl = await fetchWikipediaImage(parts.slice(0, 2).join(" "));
+  try {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      return NextResponse.json({ image_url: null }, { status: 401 });
     }
-  }
 
-  if (!imageUrl) {
-    imageUrl = await fetchPlantNetImage(scientific_name);
-  }
+    const body = await request.json().catch(() => null);
+    if (!body) {
+      return NextResponse.json({ image_url: null });
+    }
 
-  if (imageUrl) {
-    await sql`UPDATE plants SET image_url = ${imageUrl}, updated_at = NOW() WHERE id = ${id}`;
-  }
+    const { id, scientific_name } = body as { id: string; scientific_name: string };
 
-  return NextResponse.json({ image_url: imageUrl });
+    if (!id || !scientific_name) {
+      return NextResponse.json({ image_url: null });
+    }
+
+    const existing = await sql`SELECT image_url FROM plants WHERE id = ${id}`;
+    if (existing[0]?.image_url) {
+      return NextResponse.json({ image_url: existing[0].image_url });
+    }
+
+    let imageUrl = await fetchWikipediaImage(scientific_name);
+
+    if (!imageUrl) {
+      const parts = scientific_name.split(" ");
+      if (parts.length >= 2) {
+        imageUrl = await fetchWikipediaImage(parts.slice(0, 2).join(" "));
+      }
+    }
+
+    if (!imageUrl) {
+      imageUrl = await fetchPlantNetImage(scientific_name);
+    }
+
+    if (imageUrl) {
+      await sql`UPDATE plants SET image_url = ${imageUrl}, updated_at = NOW() WHERE id = ${id}`.catch(() => {});
+    }
+
+    return NextResponse.json({ image_url: imageUrl });
+  } catch (err) {
+    console.error("resolve-image error:", err);
+    return NextResponse.json({ image_url: null });
+  }
 }
