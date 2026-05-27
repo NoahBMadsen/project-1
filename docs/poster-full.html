@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Bramble - Senior Capstone Poster</title>
+<style>
+  @page { size: 48in 36in; margin: 0; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 48in; height: 36in; }
+  body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #1c1917; display: flex; }
+
+  .panel-side { width: 12in; height: 36in; padding: 1in 0.8in; display: flex; flex-direction: column; background: #f7f6f4; }
+  .panel-center { width: 24in; height: 36in; padding: 1in; display: flex; flex-direction: column; align-items: center; background: white; border-left: 1px solid #e0ddd9; border-right: 1px solid #e0ddd9; }
+
+  /* Panel titles */
+  .ptitle { font-size: 36pt; font-weight: 800; color: #14532d; text-transform: uppercase; letter-spacing: 3px; }
+  .psub { font-size: 14pt; color: #78716c; margin-top: 6pt; }
+  .pbar { width: 70px; height: 5px; background: #16a34a; border-radius: 3px; margin-top: 12pt; margin-bottom: 28pt; }
+
+  /* LEFT PANEL */
+  .intro { font-size: 13pt; color: #78716c; line-height: 1.7; margin-bottom: 28pt; }
+  .stitle { font-size: 20pt; font-weight: 700; color: #1c1917; margin-bottom: 14pt; margin-top: 22pt; }
+
+  .timeline { display: flex; flex-direction: column; gap: 16pt; }
+  .tl { display: flex; gap: 12pt; align-items: flex-start; }
+  .tl-d { width: 12px; height: 12px; border-radius: 50%; background: #16a34a; flex-shrink: 0; margin-top: 5pt; }
+  .tl-t { font-size: 15pt; font-weight: 700; color: #1c1917; }
+  .tl-x { font-size: 12pt; color: #78716c; line-height: 1.5; margin-top: 2pt; }
+
+  .badges { display: flex; flex-wrap: wrap; gap: 6pt; margin-top: 6pt; }
+  .badge { padding: 4pt 12pt; border-radius: 14pt; border: 1.5px solid #d6d3d1; background: white; font-size: 11pt; font-weight: 500; color: #44403c; }
+
+  .sk { display: flex; justify-content: space-between; align-items: center; padding: 5pt 0; }
+  .sk-n { font-size: 13pt; color: #44403c; }
+  .sk-l { font-size: 10pt; font-weight: 600; padding: 3pt 10pt; border-radius: 6pt; }
+  .sk-i { background: #16a34a; color: white; }
+  .sk-p { background: #dbeafe; color: #1e40af; }
+  .sk-e { background: #fffbeb; color: #b45309; }
+
+  .legend { display: flex; gap: 16pt; margin-top: 10pt; }
+  .leg { display: flex; align-items: center; gap: 5pt; font-size: 10pt; color: #78716c; }
+  .legb { width: 14px; height: 14px; border-radius: 3px; }
+
+  /* CENTER PANEL */
+  .logo-row { display: flex; align-items: center; gap: 18pt; margin-bottom: 14pt; }
+  .logo-t { font-size: 72pt; font-weight: 800; color: #1c1917; letter-spacing: -3px; }
+  .logo-s { font-size: 18pt; color: #16a34a; font-weight: 600; letter-spacing: 4px; text-transform: uppercase; }
+  .appdesc { font-size: 15pt; color: #78716c; text-align: center; max-width: 20in; line-height: 1.6; margin-bottom: 28pt; }
+
+  .phones { display: flex; gap: 0.5in; justify-content: center; align-items: flex-start; margin-bottom: 28pt; }
+  .ph { display: flex; flex-direction: column; align-items: center; gap: 8pt; }
+  .phf { width: 2.6in; height: 4.6in; border-radius: 22px; border: 4px solid #1c1917; background: white; overflow: hidden; display: flex; flex-direction: column; }
+  .phn { height: 22px; background: #1c1917; display: flex; align-items: center; justify-content: center; }
+  .phnb { width: 44px; height: 5px; border-radius: 3px; background: #44403c; }
+  .phs { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 12pt; gap: 6pt; }
+  .phl { font-size: 13pt; font-weight: 600; color: #44403c; }
+  .st { font-size: 12pt; font-weight: 600; color: #44403c; }
+  .sx { font-size: 9pt; color: #78716c; text-align: center; }
+  .sb { padding: 4pt 16pt; border-radius: 8pt; background: #16a34a; color: white; font-size: 10pt; font-weight: 600; }
+  .mapz { width: 100%; flex: 1; border-radius: 8px; background: #c8e6c9; position: relative; display: flex; align-items: center; justify-content: center; font-size: 28pt; }
+  .mpin { position: absolute; width: 12px; height: 12px; border-radius: 50%; border: 2px solid white; }
+  .mnav { display: flex; gap: 12pt; margin-top: 4pt; font-size: 9pt; color: #a8a29e; }
+  .mnav .a { color: #16a34a; font-weight: 700; }
+  .scz { width: 100%; flex: 1; border-radius: 8px; background: #e3f2fd; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6pt; }
+  .scr { width: 56px; height: 56px; border-radius: 50%; border: 3px solid #16a34a; display: flex; align-items: center; justify-content: center; font-size: 22pt; }
+  .rb { width: 100%; padding: 8pt; background: #dcfce7; border-radius: 8px; text-align: center; }
+  .rn { font-size: 11pt; font-weight: 700; color: #14532d; }
+  .rc { font-size: 10pt; color: #78716c; }
+  .rf { font-size: 9pt; color: #16a34a; margin-top: 2pt; }
+  .rtags { display: flex; gap: 4pt; margin-top: 4pt; }
+  .rtag { padding: 2pt 8pt; border-radius: 5pt; font-size: 9pt; }
+  .rte { background: #dcfce7; color: #14532d; }
+  .rtm { background: #dbeafe; color: #1e40af; }
+
+  .steps { display: flex; gap: 1in; justify-content: center; margin-bottom: 22pt; }
+  .stp { display: flex; flex-direction: column; align-items: center; gap: 6pt; width: 3in; }
+  .stn { width: 40px; height: 40px; border-radius: 50%; background: #16a34a; color: white; display: flex; align-items: center; justify-content: center; font-size: 20pt; font-weight: 800; }
+  .stt { font-size: 18pt; font-weight: 700; color: #1c1917; }
+  .std { font-size: 12pt; color: #78716c; text-align: center; }
+
+  .cdiv { width: 100%; height: 2px; background: #e7e5e4; margin-bottom: 22pt; }
+
+  .feats { width: 100%; display: flex; gap: 0.6in; }
+  .fcol { flex: 1; display: flex; flex-direction: column; gap: 16pt; }
+  .fi { display: flex; gap: 10pt; align-items: flex-start; }
+  .fd { width: 10px; height: 10px; border-radius: 50%; background: #16a34a; flex-shrink: 0; margin-top: 5pt; }
+  .ft { font-size: 15pt; font-weight: 700; color: #1c1917; }
+  .fx { font-size: 12pt; color: #78716c; line-height: 1.5; }
+  .fst { font-size: 17pt; font-weight: 700; color: #1c1917; margin-bottom: 6pt; }
+
+  .tbar { width: 100%; padding: 14pt 24pt; background: #dcfce7; border-radius: 12px; border: 2px solid #16a34a; display: flex; justify-content: space-between; align-items: center; margin-top: 22pt; }
+  .tbl { font-size: 14pt; font-weight: 700; color: #14532d; }
+  .tbv { font-size: 12pt; color: #44403c; margin-top: 4pt; line-height: 1.5; }
+  .tbc { font-size: 12pt; color: #a8a29e; text-align: right; }
+
+  /* RIGHT PANEL */
+  .lessons { display: flex; flex-direction: column; gap: 16pt; }
+  .les { padding: 16pt; background: white; border-radius: 12px; border-left: 5px solid #16a34a; }
+  .lh { display: flex; gap: 12pt; align-items: flex-start; }
+  .ln { width: 32px; height: 32px; border-radius: 50%; background: #dcfce7; display: flex; align-items: center; justify-content: center; font-size: 15pt; font-weight: 800; color: #14532d; flex-shrink: 0; }
+  .lq { font-size: 14pt; font-weight: 700; color: #14532d; font-style: italic; line-height: 1.4; }
+  .lx { font-size: 12pt; color: #78716c; margin-top: 6pt; line-height: 1.5; }
+
+  .takeaway { margin-top: 24pt; border-top: 2px solid #e7e5e4; padding-top: 20pt; }
+  .takebox { padding: 18pt; background: #dcfce7; border-radius: 12px; border: 2px solid #16a34a; margin-top: 12pt; }
+  .taket { font-size: 15pt; color: #14532d; line-height: 1.6; font-style: italic; font-weight: 600; }
+
+  .qrsec { margin-top: auto; display: flex; flex-direction: column; align-items: center; gap: 12pt; padding: 24pt; background: white; border-radius: 16px; border: 2px solid #e7e5e4; }
+  .qrt { font-size: 18pt; font-weight: 700; color: #1c1917; }
+  .qru { font-size: 26pt; font-weight: 800; color: #16a34a; letter-spacing: 0.5px; }
+  #qr-container { width: 200px; height: 200px; display: flex; align-items: center; justify-content: center; }
+</style>
+</head>
+<body>
+
+<!-- LEFT PANEL: 12" x 36" -->
+<div class="panel-side">
+  <div class="ptitle">What I Did</div>
+  <div class="psub">2-Week Software Engineering Shadow Program</div>
+  <div class="pbar"></div>
+
+  <div class="intro">
+    Shadowed a senior software engineer for two weeks in a hybrid format - in-person office days and remote distributed team simulation via Slack and Zoom. Learned the full software development lifecycle from ideation to deployment.
+  </div>
+
+  <div class="stitle">The Timeline</div>
+  <div class="timeline">
+    <div class="tl"><div class="tl-d"></div><div><div class="tl-t">Day 1 - Hello World</div><div class="tl-x">Set up development environment. Created first GitHub repository. Built and deployed a website to GitHub Pages.</div></div></div>
+    <div class="tl"><div class="tl-d"></div><div><div class="tl-t">Day 2 - Real Engineering</div><div class="tl-x">Observed daily standup and sprint planning meetings. Whiteboarded web architecture and database fundamentals.</div></div></div>
+    <div class="tl"><div class="tl-d"></div><div><div class="tl-t">Day 3 - Project Ideation</div><div class="tl-x">Brainstormed app ideas using AI. Evaluated 3 finalist concepts. Selected Bramble as the capstone project.</div></div></div>
+    <div class="tl"><div class="tl-d"></div><div><div class="tl-t">Weekend - Learning JavaScript</div><div class="tl-x">Completed freeCodeCamp JavaScript projects. Learned variables, loops, conditionals, and functions.</div></div></div>
+    <div class="tl"><div class="tl-d"></div><div><div class="tl-t">Remote Day - Distributed Work</div><div class="tl-x">Full remote simulation. Standups on Zoom. Slack threading etiquette. End-of-day written reports.</div></div></div>
+    <div class="tl"><div class="tl-d"></div><div><div class="tl-t">Architecture Day</div><div class="tl-x">Created wireframes in Excalidraw. Made tech stack decisions. Designed database schema with 5 tables.</div></div></div>
+    <div class="tl"><div class="tl-d"></div><div><div class="tl-t">Build Days</div><div class="tl-x">Set up Linear for project management. Built authentication, database, and deployed to Vercel. Merged 5 pull requests.</div></div></div>
+    <div class="tl"><div class="tl-d"></div><div><div class="tl-t">Final Sprint</div><div class="tl-x">Integrated AI plant ID, community map, journal, and invasive species detection. Shipped to bramblemap.com.</div></div></div>
+  </div>
+
+  <div class="stitle">Tools I Used</div>
+  <div class="badges">
+    <span class="badge">Cursor IDE</span>
+    <span class="badge">Claude AI</span>
+    <span class="badge">GitHub</span>
+    <span class="badge">Linear</span>
+    <span class="badge">Slack</span>
+    <span class="badge">Zoom</span>
+    <span class="badge">TypeScript</span>
+    <span class="badge">React</span>
+    <span class="badge">Next.js</span>
+    <span class="badge">Tailwind CSS</span>
+    <span class="badge">Supabase</span>
+    <span class="badge">PostGIS</span>
+    <span class="badge">Drizzle ORM</span>
+    <span class="badge">Vercel</span>
+    <span class="badge">Excalidraw</span>
+    <span class="badge">freeCodeCamp</span>
+  </div>
+
+  <div class="stitle">Skills Developed</div>
+  <div class="sk"><span class="sk-n">JavaScript Fundamentals</span><span class="sk-l sk-p">Practiced</span></div>
+  <div class="sk"><span class="sk-n">Git & GitHub Workflows</span><span class="sk-l sk-p">Practiced</span></div>
+  <div class="sk"><span class="sk-n">AI-Assisted Engineering</span><span class="sk-l sk-i">Internalized</span></div>
+  <div class="sk"><span class="sk-n">Project Management (Linear)</span><span class="sk-l sk-p">Practiced</span></div>
+  <div class="sk"><span class="sk-n">Database Schema Design</span><span class="sk-l sk-e">Exposed</span></div>
+  <div class="sk"><span class="sk-n">Authentication & Deployment</span><span class="sk-l sk-p">Practiced</span></div>
+  <div class="sk"><span class="sk-n">Distributed Team Work</span><span class="sk-l sk-p">Practiced</span></div>
+  <div class="sk"><span class="sk-n">Professional Communication</span><span class="sk-l sk-i">Internalized</span></div>
+  <div class="legend">
+    <div class="leg"><div class="legb" style="background:#16a34a"></div>Internalized</div>
+    <div class="leg"><div class="legb" style="background:#dbeafe"></div>Practiced</div>
+    <div class="leg"><div class="legb" style="background:#fffbeb;border:1px solid #b45309"></div>Exposed</div>
+  </div>
+</div>
+
+<!-- CENTER PANEL: 24" x 36" -->
+<div class="panel-center">
+  <div class="logo-row">
+    <svg width="68" height="68" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M11 20A7 7 0 0 1 9.8 6.9C15.5 4.9 20 7 20 7s2.1 4.5 .1 10.2A7 7 0 0 1 11 20"/>
+      <path d="M10 20.5c2-2.5 3-5 3.5-8.5"/>
+    </svg>
+    <div>
+      <div class="logo-t">Bramble</div>
+      <div class="logo-s">Community Foraging App</div>
+    </div>
+  </div>
+
+  <div class="appdesc">Identify wild plants with AI, keep a personal foraging journal, and share your discoveries on a community map. Built for foragers, hikers, and the naturally curious.</div>
+
+  <div class="phones">
+    <div class="ph"><div class="phf"><div class="phn"><div class="phnb"></div></div><div class="phs" style="background:white"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.9C15.5 4.9 20 7 20 7s2.1 4.5 .1 10.2A7 7 0 0 1 11 20"/><path d="M10 20.5c2-2.5 3-5 3.5-8.5"/></svg><div style="font-size:16pt;font-weight:700;color:#1c1917">Bramble</div><div class="sx">Know what grows around you</div><div class="sb" style="margin-top:10pt">Get Started</div></div></div><div class="phl">Landing Page</div></div>
+
+    <div class="ph"><div class="phf"><div class="phn"><div class="phnb"></div></div><div class="phs" style="background:#e8f5e9"><div class="st">Community Map</div><div class="mapz">&#127758;<div class="mpin" style="top:40px;left:30px;background:#16a34a"></div><div class="mpin" style="top:80px;left:100px;background:#ef4444"></div><div class="mpin" style="top:120px;left:65px;background:#16a34a"></div></div><div class="mnav"><span class="a">Map</span><span>Scan</span><span>Journal</span><span>Plants</span></div></div></div><div class="phl">Community Map</div></div>
+
+    <div class="ph"><div class="phf"><div class="phn"><div class="phnb"></div></div><div class="phs" style="background:#f0f9ff"><div class="st">Scan a Plant</div><div class="scz"><div class="scr">&#128247;</div><div class="sx">Tap to capture</div></div></div></div><div class="phl">Camera Scan</div></div>
+
+    <div class="ph"><div class="phf"><div class="phn"><div class="phnb"></div></div><div class="phs" style="background:white"><div class="st">Identified!</div><div class="rb"><div class="rn">Taraxacum officinale</div><div class="rc">Common Dandelion</div><div class="rf">94% confidence</div></div><div class="rtags"><span class="rtag rte">Edible</span><span class="rtag rtm">Medicinal</span></div><div class="sb" style="margin-top:8pt">Save to Journal</div></div></div><div class="phl">Plant ID Results</div></div>
+  </div>
+
+  <div class="steps">
+    <div class="stp"><div class="stn">1</div><div class="stt">Scan</div><div class="std">Point your camera at any plant</div></div>
+    <div class="stp"><div class="stn">2</div><div class="stt">Identify</div><div class="std">AI matches against thousands of species</div></div>
+    <div class="stp"><div class="stn">3</div><div class="stt">Learn & Share</div><div class="std">Get safety info, save to journal, and pin on the community map</div></div>
+  </div>
+
+  <div class="cdiv"></div>
+
+  <div class="feats">
+    <div class="fcol">
+      <div class="fst">Features</div>
+      <div class="fi"><div class="fd"></div><div><div class="ft">AI Plant Identification</div><div class="fx">Snap a photo and Bramble uses the Pl@ntNet API to identify the species with confidence scoring.</div></div></div>
+      <div class="fi"><div class="fd"></div><div><div class="ft">Safety Information</div><div class="fx">Every plant shows edible, medicinal, toxic, and invasive status. Unverified plants display a clear safety warning.</div></div></div>
+      <div class="fi"><div class="fd"></div><div><div class="ft">Invasive Species Detection</div><div class="fx">Cross-references 1,500+ species from the USGS national invasive species registry.</div></div></div>
+      <div class="fi"><div class="fd"></div><div><div class="ft">Community Map</div><div class="fx">Interactive map shows plant discoveries from all users within 25 miles using PostGIS spatial queries.</div></div></div>
+    </div>
+    <div class="fcol">
+      <div class="fst">&nbsp;</div>
+      <div class="fi"><div class="fd"></div><div><div class="ft">Foraging Journal</div><div class="fx">Every scan auto-creates an entry with species name, GPS coordinates, date, and confidence score.</div></div></div>
+      <div class="fi"><div class="fd"></div><div><div class="ft">Plant Database</div><div class="fx">Search 34,000+ plant species from the USDA database. Filter by edible, medicinal, toxic, or invasive.</div></div></div>
+      <div class="fi"><div class="fd"></div><div><div class="ft">Secure Authentication</div><div class="fx">One-click Google sign-in via Supabase. No passwords to remember.</div></div></div>
+      <div class="fi"><div class="fd"></div><div><div class="ft">3 Authoritative Data Sources</div><div class="fx">Pl@ntNet API for real-time ID, USDA PLANTS for taxonomy, USGS US-RIIS for invasive species.</div></div></div>
+    </div>
+  </div>
+
+  <div class="tbar">
+    <div><div class="tbl">Tech Stack</div><div class="tbv">Next.js 16 / React 19 / TypeScript / Tailwind CSS / Supabase + PostGIS / Drizzle ORM / Vercel</div></div>
+    <div class="tbc">Noah Madsen<br>Senior Capstone Project, 2026</div>
+  </div>
+</div>
+
+<!-- RIGHT PANEL: 12" x 36" -->
+<div class="panel-side">
+  <div class="ptitle">What I Learned</div>
+  <div class="psub">Reflections from a 2-week engineering shadow</div>
+  <div class="pbar"></div>
+
+  <div class="lessons">
+    <div class="les"><div class="lh"><div class="ln">1</div><div><div class="lq">"Asking for help is engineering, not weakness."</div><div class="lx">The 20-minute rule: try seriously for 20 minutes, then escalate. Going dark when stuck doesn't make the problem go away - it makes it compound.</div></div></div></div>
+    <div class="les"><div class="lh"><div class="ln">2</div><div><div class="lq">"AI proposes, human curates."</div><div class="lx">AI-assisted coding is a multiplier on what you already understand, not a substitute for understanding. The human judgment layer is where engineers earn their keep.</div></div></div></div>
+    <div class="les"><div class="lh"><div class="ln">3</div><div><div class="lq">"Infrastructure is invisible to users."</div><div class="lx">Building the foundation feels productive. But real engineering is shipping end-to-end. Deciding what to cut matters as much as deciding what to build.</div></div></div></div>
+    <div class="les"><div class="lh"><div class="ln">4</div><div><div class="lq">"Show me where in MY code this is referenced."</div><div class="lx">When an AI asks for something you don't recognize, ask it to prove the requirement by reading the actual code.</div></div></div></div>
+    <div class="les"><div class="lh"><div class="ln">5</div><div><div class="lq">"Match your tools to the shape of the work."</div><div class="lx">Cycles for ongoing teams. Milestones for projects with an end date. Default settings aren't always correct.</div></div></div></div>
+    <div class="les"><div class="lh"><div class="ln">6</div><div><div class="lq">"The next engineer should run it without asking a single question."</div><div class="lx">If a machine-specific requirement exists, document it. That's the difference between code and a product.</div></div></div></div>
+  </div>
+
+  <div class="takeaway">
+    <div class="stitle">The Biggest Takeaway</div>
+    <div class="takebox">
+      <div class="taket">"Senior engineers don't ship perfect code. They ship code, then iterate. The skill I needed most wasn't coding - it was saying 'I'm stuck, here's what I tried, can you help?'"</div>
+    </div>
+  </div>
+
+  <div class="qrsec">
+    <div class="qrt">Try It Live</div>
+    <div id="qr-container"></div>
+    <div class="qru">bramblemap.com</div>
+  </div>
+</div>
+
+<script type="module">
+import QRCode from 'https://cdn.jsdelivr.net/npm/@pjaudiomv/qrcode-svg/dist/qrcode.js';
+const qr = new QRCode({
+  content: 'https://bramblemap.com',
+  width: 200,
+  height: 200,
+  padding: 2,
+  color: '#1c1917',
+  background: '#ffffff',
+  ecl: 'M',
+  join: true,
+  container: 'svg-viewbox',
+});
+document.getElementById('qr-container').innerHTML = qr.svg();
+</script>
+</body>
+</html>

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Bramble Poster - Left Panel (12" x 36")</title>
+<style>
+  @page { size: 12in 36in; margin: 0; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { width: 12in; height: 36in; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: #fafaf8; color: #1c1917; overflow: hidden; }
+  .panel { width: 12in; height: 36in; padding: 0.6in 0.5in; display: flex; flex-direction: column; }
+
+  .panel-title { font-size: 32pt; font-weight: 800; color: #14532d; text-transform: uppercase; letter-spacing: 3px; }
+  .panel-subtitle { font-size: 13pt; color: #78716c; margin-top: 4pt; }
+  .title-bar { width: 60px; height: 5px; background: #16a34a; border-radius: 3px; margin-top: 10pt; margin-bottom: 20pt; }
+
+  .intro { font-size: 12pt; color: #78716c; line-height: 1.6; margin-bottom: 24pt; }
+
+  .section-title { font-size: 18pt; font-weight: 700; color: #1c1917; margin-bottom: 12pt; margin-top: 20pt; }
+
+  .timeline { display: flex; flex-direction: column; gap: 14pt; }
+  .tl-item { display: flex; gap: 12pt; align-items: flex-start; }
+  .tl-dot { width: 12px; height: 12px; border-radius: 50%; background: #16a34a; flex-shrink: 0; margin-top: 4pt; }
+  .tl-title { font-size: 14pt; font-weight: 700; color: #1c1917; }
+  .tl-detail { font-size: 11pt; color: #78716c; line-height: 1.4; }
+
+  .badges { display: flex; flex-wrap: wrap; gap: 6pt; margin-top: 4pt; }
+  .badge { padding: 4pt 10pt; border-radius: 14pt; border: 1.5px solid #d6d3d1; background: white; font-size: 10pt; font-weight: 500; color: #44403c; }
+
+  .skill-row { display: flex; justify-content: space-between; align-items: center; padding: 4pt 0; }
+  .skill-name { font-size: 12pt; color: #44403c; }
+  .skill-level { font-size: 9pt; font-weight: 600; padding: 2pt 8pt; border-radius: 6pt; }
+  .lvl-int { background: #16a34a; color: white; }
+  .lvl-pra { background: #dbeafe; color: #1e40af; }
+  .lvl-exp { background: #fffbeb; color: #b45309; }
+
+  .legend { display: flex; gap: 14pt; margin-top: 8pt; }
+  .legend-item { display: flex; align-items: center; gap: 4pt; font-size: 9pt; color: #78716c; }
+  .legend-box { width: 12px; height: 12px; border-radius: 3px; }
+</style>
+</head>
+<body>
+<div class="panel">
+
+  <div class="panel-title">What I Did</div>
+  <div class="panel-subtitle">2-Week Software Engineering Shadow Program</div>
+  <div class="title-bar"></div>
+
+  <div class="intro">
+    Shadowed a senior software engineer for two weeks in a hybrid format - in-person office days and remote distributed team simulation via Slack and Zoom. Learned the full software development lifecycle from ideation to deployment.
+  </div>
+
+  <div class="section-title">The Timeline</div>
+  <div class="timeline">
+    <div class="tl-item"><div class="tl-dot"></div><div><div class="tl-title">Day 1 - Hello World</div><div class="tl-detail">Set up development environment. Created first GitHub repository. Built and deployed a website to GitHub Pages.</div></div></div>
+    <div class="tl-item"><div class="tl-dot"></div><div><div class="tl-title">Day 2 - Real Engineering</div><div class="tl-detail">Observed daily standup and sprint planning meetings. Whiteboarded web architecture and database fundamentals.</div></div></div>
+    <div class="tl-item"><div class="tl-dot"></div><div><div class="tl-title">Day 3 - Project Ideation</div><div class="tl-detail">Brainstormed app ideas using AI. Evaluated 3 finalist concepts. Selected Bramble as the capstone project.</div></div></div>
+    <div class="tl-item"><div class="tl-dot"></div><div><div class="tl-title">Weekend - Learning JavaScript</div><div class="tl-detail">Completed freeCodeCamp JavaScript projects. Learned variables, loops, conditionals, and functions.</div></div></div>
+    <div class="tl-item"><div class="tl-dot"></div><div><div class="tl-title">Remote Day - Distributed Work</div><div class="tl-detail">Full remote day simulation. Daily standups on Zoom. Slack threading etiquette. End-of-day written reports.</div></div></div>
+    <div class="tl-item"><div class="tl-dot"></div><div><div class="tl-title">Architecture Day</div><div class="tl-detail">Created wireframes in Excalidraw. Made tech stack decisions. Designed the database schema with 5 tables and foreign key relationships.</div></div></div>
+    <div class="tl-item"><div class="tl-dot"></div><div><div class="tl-title">Build Days</div><div class="tl-detail">Set up Linear for project management. Built authentication, database schema, and deployed to Vercel. Merged 5 pull requests.</div></div></div>
+    <div class="tl-item"><div class="tl-dot"></div><div><div class="tl-title">Final Sprint</div><div class="tl-detail">Integrated AI plant identification, community map, foraging journal, and invasive species detection. Shipped to bramblemap.com.</div></div></div>
+  </div>
+
+  <div class="section-title">Tools I Used</div>
+  <div class="badges">
+    <span class="badge">Cursor IDE</span>
+    <span class="badge">Claude AI</span>
+    <span class="badge">GitHub</span>
+    <span class="badge">Linear</span>
+    <span class="badge">Slack</span>
+    <span class="badge">Zoom</span>
+    <span class="badge">TypeScript</span>
+    <span class="badge">React</span>
+    <span class="badge">Next.js</span>
+    <span class="badge">Tailwind CSS</span>
+    <span class="badge">Supabase</span>
+    <span class="badge">PostGIS</span>
+    <span class="badge">Drizzle ORM</span>
+    <span class="badge">Vercel</span>
+    <span class="badge">Excalidraw</span>
+    <span class="badge">freeCodeCamp</span>
+  </div>
+
+  <div class="section-title">Skills Developed</div>
+  <div class="skill-row"><span class="skill-name">JavaScript Fundamentals</span><span class="skill-level lvl-pra">Practiced</span></div>
+  <div class="skill-row"><span class="skill-name">Git & GitHub Workflows</span><span class="skill-level lvl-pra">Practiced</span></div>
+  <div class="skill-row"><span class="skill-name">AI-Assisted Engineering</span><span class="skill-level lvl-int">Internalized</span></div>
+  <div class="skill-row"><span class="skill-name">Project Management (Linear)</span><span class="skill-level lvl-pra">Practiced</span></div>
+  <div class="skill-row"><span class="skill-name">Database Schema Design</span><span class="skill-level lvl-exp">Exposed</span></div>
+  <div class="skill-row"><span class="skill-name">Authentication & Deployment</span><span class="skill-level lvl-pra">Practiced</span></div>
+  <div class="skill-row"><span class="skill-name">Distributed Team Work</span><span class="skill-level lvl-pra">Practiced</span></div>
+  <div class="skill-row"><span class="skill-name">Professional Communication</span><span class="skill-level lvl-int">Internalized</span></div>
+
+  <div class="legend">
+    <div class="legend-item"><div class="legend-box" style="background:#16a34a"></div>Internalized</div>
+    <div class="legend-item"><div class="legend-box" style="background:#dbeafe"></div>Practiced</div>
+    <div class="legend-item"><div class="legend-box" style="background:#fffbeb;border:1px solid #b45309"></div>Exposed</div>
+  </div>
+
+</div>
+</body>
+</html>

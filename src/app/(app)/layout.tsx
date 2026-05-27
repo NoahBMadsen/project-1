@@ -4,6 +4,7 @@ import { BottomNav } from "@/components/bottom-nav";
 import { LocationProvider } from "@/components/location-provider";
 import { Leaf, LogOut } from "lucide-react";
 import Link from "next/link";
+import { sql } from "@/db";
 
 export default async function AppLayout({
   children,
@@ -17,6 +18,13 @@ export default async function AppLayout({
 
   if (!user) {
     redirect("/sign-in");
+  }
+
+  const rows = await sql`
+    SELECT onboarded_at FROM users WHERE id = ${user.id}
+  `;
+  if (rows.length === 0 || rows[0].onboarded_at == null) {
+    redirect("/welcome");
   }
 
   const displayName =
@@ -36,7 +44,9 @@ export default async function AppLayout({
             </span>
           </Link>
           <div className="flex items-center gap-3">
-            <span className="text-sm text-stone-500">{displayName}</span>
+            <Link href="/profile" className="text-sm text-stone-500 hover:text-stone-700 transition">
+              {displayName}
+            </Link>
             <form action="/auth/sign-out" method="post">
               <button
                 type="submit"

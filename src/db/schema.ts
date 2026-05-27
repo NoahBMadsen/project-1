@@ -52,7 +52,11 @@ export const users = pgTable("users", {
   id: uuid("id").primaryKey(),
   email: varchar("email", { length: 255 }).notNull().unique(),
   displayName: varchar("display_name", { length: 100 }),
+  username: varchar("username", { length: 50 }),
+  // 'anonymous' | 'username' | 'real_name'
+  displayPreference: varchar("display_preference", { length: 20 }).notNull().default("anonymous"),
   avatarUrl: text("avatar_url"),
+  onboardedAt: timestamp("onboarded_at", { withTimezone: true }),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });
@@ -97,6 +101,7 @@ export const communityPins = pgTable("community_pins", {
   speciesName: varchar("species_name", { length: 255 }),
   // PostGIS point — used for ST_DWithin radius queries on the community map
   location: geography("location").notNull(),
+  sharedNotes: text("shared_notes"),
   pinnedAt: timestamp("pinned_at", { withTimezone: true }).notNull().defaultNow(),
 });
 

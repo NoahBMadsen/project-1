@@ -2,6 +2,7 @@
 
 import { useState, useRef, useCallback, useEffect } from "react";
 import { Camera, RotateCcw, Loader2, BookOpen, MapPin } from "lucide-react";
+import { useLocation } from "@/components/location-provider";
 
 interface IdentifyResult {
   identification: {
@@ -28,6 +29,7 @@ interface IdentifyResult {
 type ScanState = "camera" | "identifying" | "result";
 
 export default function ScanPage() {
+  const { invalidateJournal } = useLocation();
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -38,7 +40,7 @@ export default function ScanPage() {
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [notes, setNotes] = useState("");
-  const [shareToMap, setShareToMap] = useState(true);
+  const [shareNotes, setShareNotes] = useState(false);
   const [saved, setSaved] = useState(false);
   const [userLocation, setUserLocation] = useState<{
     lat: number;
@@ -146,11 +148,12 @@ export default function ScanPage() {
           latitude: userLocation?.lat ?? null,
           longitude: userLocation?.lng ?? null,
           notes: notes || null,
-          shareToMap,
+          shareNotes,
         }),
       });
 
       if (!res.ok) throw new Error("Save failed");
+      invalidateJournal();
       setSaved(true);
     } catch {
       setError("Failed to save. Please try again.");
@@ -166,6 +169,7 @@ export default function ScanPage() {
     setCapturedImage(null);
     setError(null);
     setNotes("");
+    setShareNotes(false);
     setSaved(false);
     startCamera();
   };
@@ -348,16 +352,23 @@ export default function ScanPage() {
                 rows={3}
               />
 
-              <label className="mt-3 flex items-center gap-2 text-sm text-stone-600">
-                <input
-                  type="checkbox"
-                  checked={shareToMap}
-                  onChange={(e) => setShareToMap(e.target.checked)}
-                  className="size-4 rounded border-stone-300 text-emerald-600 focus:ring-emerald-500"
-                />
-                <MapPin className="size-4" />
-                Share location on community map
-              </label>
+              {notes.length > 0 && (
+                <label className="mt-3 flex items-center gap-2 text-sm text-stone-600">
+                  <input
+                    type="checkbox"
+                    checked={shareNotes}
+                    onChange={(e) => setShareNotes(e.target.checked)}
+                    className="size-4 rounded border-stone-300 text-emerald-600 focus:ring-emerald-500"
+                  />
+                  <BookOpen className="size-4" />
+                  Share notes on community map
+                </label>
+              )}
+
+              <p className="mt-2 flex items-center gap-1.5 text-xs text-stone-400">
+                <MapPin className="size-3" />
+                Your find will be pinned on the community map
+              </p>
 
               <button
                 onClick={saveToJournal}
@@ -377,11 +388,9 @@ export default function ScanPage() {
               <p className="font-medium text-emerald-700">
                 Saved to your journal!
               </p>
-              {shareToMap && (
-                <p className="mt-1 text-sm text-emerald-600">
-                  Pinned on the community map
-                </p>
-              )}
+              <p className="mt-1 text-sm text-emerald-600">
+                Pinned on the community map
+              </p>
             </div>
           )}
 

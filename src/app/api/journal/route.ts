@@ -1,8 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import postgres from "postgres";
-
-const sql = postgres(process.env.DATABASE_URL!);
+import { sql } from "@/db";
 
 export async function GET() {
   const supabase = await createClient();
@@ -64,7 +62,7 @@ export async function POST(request: Request) {
     latitude,
     longitude,
     notes,
-    shareToMap,
+    shareNotes,
   } = body;
 
   const locationValue =
@@ -87,15 +85,16 @@ export async function POST(request: Request) {
 
   const entry = entryRows[0];
 
-  if (shareToMap && locationValue && entry) {
+  if (locationValue && entry) {
     await sql`
-      INSERT INTO community_pins (user_id, journal_entry_id, plant_id, species_name, location)
+      INSERT INTO community_pins (user_id, journal_entry_id, plant_id, species_name, location, shared_notes)
       VALUES (
         ${user.id},
         ${entry.id},
         ${plantId ?? null},
         ${speciesName ?? null},
-        ST_GeogFromText(${locationValue})
+        ST_GeogFromText(${locationValue}),
+        ${shareNotes && notes ? notes : null}
       )
     `;
   }

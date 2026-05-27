@@ -8,6 +8,13 @@
       "when": 1779468399595,
       "tag": "0000_yielding_shiver_man",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1748306400000,
+      "tag": "0001_user_privacy_shared_notes",
+      "breakpoints": true
     }
   ]
 }

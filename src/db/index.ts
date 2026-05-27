@@ -2,8 +2,9 @@ import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 import * as schema from "./schema";
 
-// Used only server-side (API routes, Server Actions, seed scripts)
-const client = postgres(process.env.DATABASE_URL!);
-export const db = drizzle(client, { schema });
+// Shared connection pool for all server-side code. Keeps us under Supabase's
+// session-mode pool_size limit (15) instead of each route opening its own pool.
+export const sql = postgres(process.env.DATABASE_URL!, { max: 3, idle_timeout: 20 });
+export const db = drizzle(sql, { schema });
 
 export * from "./schema";

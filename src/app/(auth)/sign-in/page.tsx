@@ -3,6 +3,7 @@
 import { createClient } from "@/lib/supabase/client";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Suspense, useState, useEffect } from "react";
+import { Loader2 } from "lucide-react";
 
 function SignInForm() {
   const searchParams = useSearchParams();
@@ -30,10 +31,12 @@ function SignInForm() {
           redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`,
         },
       });
-      if (error) setError(error.message);
+      if (error) {
+        setError(error.message);
+        setLoading(false);
+      }
     } catch (e) {
       setError(e instanceof Error ? e.message : "Unexpected error. Please try again.");
-    } finally {
       setLoading(false);
     }
   }
@@ -61,8 +64,17 @@ function SignInForm() {
           disabled={loading}
           className="flex w-full items-center justify-center gap-3 rounded-xl border border-stone-200 bg-white px-4 py-3 text-sm font-medium text-stone-700 shadow-sm transition hover:bg-stone-50 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          <GoogleIcon />
-          {loading ? "Redirecting…" : "Continue with Google"}
+          {loading ? (
+            <>
+              <Loader2 className="size-[18px] animate-spin text-emerald-600" />
+              Signing in...
+            </>
+          ) : (
+            <>
+              <GoogleIcon />
+              Continue with Google
+            </>
+          )}
         </button>
       </div>
     </div>

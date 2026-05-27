@@ -1,29 +1,49 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { BookOpen, Loader2, Camera } from "lucide-react";
+import { BookOpen, Camera } from "lucide-react";
 import Link from "next/link";
+import { useLocation, type CachedJournalEntry } from "@/components/location-provider";
 
-interface JournalEntry {
-  id: string;
-  species_name: string;
-  confidence_score: number | null;
-  notes: string | null;
-  scanned_at: string;
-  plant_common_name: string | null;
-  plant_scientific_name: string | null;
-  edible: boolean;
-  medicinal: boolean;
-  toxic: boolean;
-  invasive: boolean;
-  safety_notes: string | null;
+type JournalEntry = CachedJournalEntry;
+
+function JournalSkeleton() {
+  return (
+    <div className="space-y-3">
+      {Array.from({ length: 4 }).map((_, i) => (
+        <div key={i} className="animate-pulse rounded-2xl border border-stone-200 bg-white p-4">
+          <div className="flex items-start justify-between">
+            <div className="space-y-2">
+              <div className="h-4 w-40 rounded bg-stone-200" />
+              <div className="h-3 w-28 rounded bg-stone-100" />
+            </div>
+            <div className="h-5 w-10 rounded-full bg-stone-100" />
+          </div>
+          <div className="mt-2 flex gap-1.5">
+            <div className="h-5 w-14 rounded bg-stone-100" />
+            <div className="h-5 w-16 rounded bg-stone-100" />
+          </div>
+          <div className="mt-3 h-3 w-32 rounded bg-stone-100" />
+        </div>
+      ))}
+    </div>
+  );
 }
 
 export default function JournalPage() {
-  const [entries, setEntries] = useState<JournalEntry[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { cachedJournal } = useLocation();
+  const [entries, setEntries] = useState<JournalEntry[]>(cachedJournal ?? []);
+  const [loading, setLoading] = useState(cachedJournal == null);
 
   useEffect(() => {
+    if (cachedJournal != null && entries.length === 0) {
+      setEntries(cachedJournal);
+      setLoading(false);
+    }
+  }, [cachedJournal, entries.length]);
+
+  useEffect(() => {
+    if (cachedJournal != null) return;
     fetch("/api/journal")
       .then((res) => res.json())
       .then((data) => {
@@ -31,12 +51,13 @@ export default function JournalPage() {
         setLoading(false);
       })
       .catch(() => setLoading(false));
-  }, []);
+  }, [cachedJournal]);
 
   if (loading) {
     return (
-      <div className="flex h-64 items-center justify-center">
-        <Loader2 className="size-8 animate-spin text-emerald-600" />
+      <div className="mx-auto max-w-lg px-4 py-6">
+        <h1 className="mb-6 text-xl font-bold text-stone-900">My Foraging Journal</h1>
+        <JournalSkeleton />
       </div>
     );
   }

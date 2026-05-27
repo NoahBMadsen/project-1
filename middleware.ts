@@ -8,7 +8,9 @@ export async function middleware(request: NextRequest) {
     request.nextUrl.pathname.startsWith("/map") ||
     request.nextUrl.pathname.startsWith("/journal") ||
     request.nextUrl.pathname.startsWith("/scan") ||
-    request.nextUrl.pathname.startsWith("/plants");
+    request.nextUrl.pathname.startsWith("/plants") ||
+    request.nextUrl.pathname.startsWith("/welcome") ||
+    request.nextUrl.pathname.startsWith("/profile");
 
   let supabaseResponse = NextResponse.next({ request });
 

@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Bramble Trifold Poster 48x36</title>
+<style>
+  @page { size: 48in 36in; margin: 0; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 48in; height: 36in; overflow: hidden; }
+  body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #1c1917; display: flex; }
+
+  .left, .right { width: 12in; height: 36in; padding: 0.75in 0.65in; background: #f7f6f4; display: flex; flex-direction: column; }
+  .center { width: 24in; height: 36in; padding: 0.75in 0.85in; background: white; border-left: 1.5px solid #e0ddd9; border-right: 1.5px solid #e0ddd9; display: flex; flex-direction: column; align-items: center; }
+
+  .pt { font-size: 34pt; font-weight: 800; color: #14532d; text-transform: uppercase; letter-spacing: 3px; }
+  .ps { font-size: 13pt; color: #78716c; margin-top: 4pt; }
+  .pb { width: 60px; height: 4px; background: #16a34a; border-radius: 2px; margin: 10pt 0 18pt; }
+
+  .intro { font-size: 12.5pt; color: #78716c; line-height: 1.65; margin-bottom: 18pt; }
+  .sh { font-size: 18pt; font-weight: 700; color: #1c1917; margin: 16pt 0 10pt; }
+
+  .tl { display: flex; gap: 10pt; margin-bottom: 10pt; }
+  .td { width: 10px; height: 10px; border-radius: 50%; background: #16a34a; flex-shrink: 0; margin-top: 5pt; }
+  .tt { font-size: 13.5pt; font-weight: 700; color: #1c1917; }
+  .tx { font-size: 11pt; color: #78716c; line-height: 1.45; margin-top: 1pt; }
+
+  .badges { display: flex; flex-wrap: wrap; gap: 5pt; }
+  .bg { padding: 3pt 9pt; border-radius: 12pt; border: 1.5px solid #d6d3d1; background: white; font-size: 10pt; font-weight: 500; color: #44403c; }
+
+  .sr { display: flex; justify-content: space-between; align-items: center; padding: 3.5pt 0; }
+  .sn { font-size: 12pt; color: #44403c; }
+  .sl { font-size: 9pt; font-weight: 600; padding: 2pt 8pt; border-radius: 5pt; }
+  .si { background: #16a34a; color: white; }
+  .sp { background: #dbeafe; color: #1e40af; }
+  .se { background: #fffbeb; color: #b45309; }
+  .leg { display: flex; gap: 12pt; margin-top: 8pt; }
+  .li { display: flex; align-items: center; gap: 4pt; font-size: 9pt; color: #78716c; }
+  .lb { width: 12px; height: 12px; border-radius: 2px; }
+
+  .lr { display: flex; align-items: center; gap: 14pt; margin-bottom: 10pt; }
+  .lt { font-size: 64pt; font-weight: 800; color: #1c1917; letter-spacing: -2px; }
+  .ls { font-size: 16pt; color: #16a34a; font-weight: 600; letter-spacing: 3px; text-transform: uppercase; }
+  .ad { font-size: 14pt; color: #78716c; text-align: center; max-width: 20in; line-height: 1.55; margin-bottom: 20pt; }
+
+  .phones { display: flex; gap: 0.4in; justify-content: center; margin-bottom: 20pt; }
+  .ph { display: flex; flex-direction: column; align-items: center; gap: 6pt; }
+  .pf { width: 2.4in; height: 4.2in; border-radius: 18px; border: 3.5px solid #1c1917; background: white; overflow: hidden; display: flex; flex-direction: column; }
+  .pn { height: 18px; background: #1c1917; display: flex; align-items: center; justify-content: center; }
+  .pnb { width: 36px; height: 4px; border-radius: 2px; background: #44403c; }
+  .pc { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 10pt; gap: 5pt; }
+  .pl { font-size: 12pt; font-weight: 600; color: #44403c; }
+  .pst { font-size: 10pt; font-weight: 600; color: #44403c; }
+  .psx { font-size: 8pt; color: #78716c; text-align: center; }
+  .psb { padding: 3pt 12pt; border-radius: 6pt; background: #16a34a; color: white; font-size: 8pt; font-weight: 600; }
+  .mpa { width: 100%; flex: 1; border-radius: 6px; background: #c8e6c9; position: relative; display: flex; align-items: center; justify-content: center; font-size: 22pt; }
+  .mpn { position: absolute; width: 10px; height: 10px; border-radius: 50%; border: 1.5px solid white; }
+  .mnv { display: flex; gap: 8pt; margin-top: 3pt; font-size: 7pt; color: #a8a29e; }
+  .mnv .a { color: #16a34a; font-weight: 700; }
+  .sca { width: 100%; flex: 1; border-radius: 6px; background: #e3f2fd; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4pt; }
+  .scr { width: 44px; height: 44px; border-radius: 50%; border: 2.5px solid #16a34a; display: flex; align-items: center; justify-content: center; font-size: 16pt; }
+  .reb { width: 100%; padding: 6pt; background: #dcfce7; border-radius: 6px; text-align: center; }
+  .ren { font-size: 9pt; font-weight: 700; color: #14532d; }
+  .rec { font-size: 8pt; color: #78716c; }
+  .ref { font-size: 7pt; color: #16a34a; margin-top: 1pt; }
+  .retg { display: flex; gap: 3pt; margin-top: 3pt; }
+  .ret { padding: 1pt 5pt; border-radius: 3pt; font-size: 7pt; }
+  .rete { background: #dcfce7; color: #14532d; }
+  .retm { background: #dbeafe; color: #1e40af; }
+  .jne { width: 100%; padding: 4pt; border-bottom: 1px solid #e7e5e4; font-size: 7pt; color: #44403c; }
+
+  .steps { display: flex; gap: 0.8in; justify-content: center; margin-bottom: 18pt; }
+  .stp { display: flex; flex-direction: column; align-items: center; gap: 5pt; width: 2.8in; }
+  .stpn { width: 34px; height: 34px; border-radius: 50%; background: #16a34a; color: white; display: flex; align-items: center; justify-content: center; font-size: 17pt; font-weight: 800; }
+  .stpt { font-size: 16pt; font-weight: 700; color: #1c1917; }
+  .stpd { font-size: 11pt; color: #78716c; text-align: center; }
+
+  .cdv { width: 100%; height: 1.5px; background: #e7e5e4; margin-bottom: 18pt; }
+
+  .feats { width: 100%; display: flex; gap: 0.5in; }
+  .fc { flex: 1; display: flex; flex-direction: column; gap: 12pt; }
+  .fi { display: flex; gap: 8pt; align-items: flex-start; }
+  .fid { width: 8px; height: 8px; border-radius: 50%; background: #16a34a; flex-shrink: 0; margin-top: 5pt; }
+  .fit { font-size: 13.5pt; font-weight: 700; color: #1c1917; }
+  .fix { font-size: 11pt; color: #78716c; line-height: 1.45; }
+  .fsh { font-size: 15pt; font-weight: 700; color: #1c1917; margin-bottom: 4pt; }
+
+  .tbar { width: 100%; padding: 10pt 18pt; background: #dcfce7; border-radius: 10px; border: 1.5px solid #16a34a; display: flex; justify-content: space-between; align-items: center; margin-top: 16pt; }
+  .tbl { font-size: 12pt; font-weight: 700; color: #14532d; }
+  .tbv { font-size: 10pt; color: #44403c; margin-top: 3pt; }
+  .tbc { font-size: 10pt; color: #a8a29e; text-align: right; }
+
+  .les { padding: 12pt; background: white; border-radius: 10px; border-left: 4px solid #16a34a; margin-bottom: 10pt; }
+  .leh { display: flex; gap: 10pt; align-items: flex-start; }
+  .len { width: 26px; height: 26px; border-radius: 50%; background: #dcfce7; display: flex; align-items: center; justify-content: center; font-size: 13pt; font-weight: 800; color: #14532d; flex-shrink: 0; }
+  .leq { font-size: 12.5pt; font-weight: 700; color: #14532d; font-style: italic; line-height: 1.35; }
+  .lex { font-size: 10.5pt; color: #78716c; margin-top: 4pt; line-height: 1.45; }
+
+  .tak { margin-top: 14pt; border-top: 1.5px solid #e7e5e4; padding-top: 14pt; }
+  .takb { padding: 14pt; background: #dcfce7; border-radius: 10px; border: 1.5px solid #16a34a; margin-top: 8pt; }
+  .takt { font-size: 13pt; color: #14532d; line-height: 1.55; font-style: italic; font-weight: 600; }
+
+  .qrs { margin-top: auto; display: flex; flex-direction: column; align-items: center; gap: 8pt; padding: 16pt; background: white; border-radius: 12px; border: 1.5px solid #e7e5e4; }
+  .qrt { font-size: 14pt; font-weight: 700; color: #1c1917; }
+  .qru { font-size: 20pt; font-weight: 800; color: #16a34a; letter-spacing: 0.5px; }
+  .qrc { width: 160px; height: 160px; }
+  .qrc svg { width: 100%; height: 100%; }
+</style>
+</head>
+<body>
+
+<div class="left">
+  <div class="pt">What I Did</div>
+  <div class="ps">2-Week Software Engineering Shadow Program</div>
+  <div class="pb"></div>
+  <div class="intro">Shadowed a senior software engineer for two weeks in a hybrid format - in-person office days and remote distributed team simulation via Slack and Zoom. Learned the full software development lifecycle from ideation to deployment.</div>
+  <div class="sh">The Timeline</div>
+  <div class="tl"><div class="td"></div><div><div class="tt">Day 1 - Hello World</div><div class="tx">Set up development environment. Created first GitHub repository. Built and deployed a website to GitHub Pages.</div></div></div>
+  <div class="tl"><div class="td"></div><div><div class="tt">Day 2 - Real Engineering</div><div class="tx">Observed daily standup and sprint planning meetings. Whiteboarded web architecture and database fundamentals.</div></div></div>
+  <div class="tl"><div class="td"></div><div><div class="tt">Day 3 - Project Ideation</div><div class="tx">Brainstormed app ideas using AI. Evaluated 3 finalist concepts. Selected Bramble as the capstone project.</div></div></div>
+  <div class="tl"><div class="td"></div><div><div class="tt">Weekend - Learning JavaScript</div><div class="tx">Completed freeCodeCamp JavaScript projects. Learned variables, loops, conditionals, and functions.</div></div></div>
+  <div class="tl"><div class="td"></div><div><div class="tt">Remote Day - Distributed Work</div><div class="tx">Full remote simulation. Standups on Zoom. Slack threading etiquette. End-of-day written reports.</div></div></div>
+  <div class="tl"><div class="td"></div><div><div class="tt">Architecture Day</div><div class="tx">Created wireframes in Excalidraw. Made tech stack decisions. Designed database schema with 5 tables.</div></div></div>
+  <div class="tl"><div class="td"></div><div><div class="tt">Build Days</div><div class="tx">Set up Linear for project management. Built authentication, database, and deployed to Vercel. Merged 5 pull requests.</div></div></div>
+  <div class="tl"><div class="td"></div><div><div class="tt">Final Sprint</div><div class="tx">Integrated AI plant ID, community map, journal, and invasive species detection. Shipped to bramblemap.com.</div></div></div>
+  <div class="sh">Tools I Used</div>
+  <div class="badges">
+    <span class="bg">Cursor IDE</span><span class="bg">Claude AI</span><span class="bg">GitHub</span><span class="bg">Linear</span><span class="bg">Slack</span><span class="bg">Zoom</span><span class="bg">TypeScript</span><span class="bg">React</span><span class="bg">Next.js</span><span class="bg">Tailwind CSS</span><span class="bg">Supabase</span><span class="bg">PostGIS</span><span class="bg">Drizzle ORM</span><span class="bg">Vercel</span><span class="bg">Excalidraw</span><span class="bg">freeCodeCamp</span>
+  </div>
+  <div class="sh">Skills Developed</div>
+  <div class="sr"><span class="sn">JavaScript Fundamentals</span><span class="sl sp">Practiced</span></div>
+  <div class="sr"><span class="sn">Git & GitHub Workflows</span><span class="sl sp">Practiced</span></div>
+  <div class="sr"><span class="sn">AI-Assisted Engineering</span><span class="sl si">Internalized</span></div>
+  <div class="sr"><span class="sn">Project Management (Linear)</span><span class="sl sp">Practiced</span></div>
+  <div class="sr"><span class="sn">Database Schema Design</span><span class="sl se">Exposed</span></div>
+  <div class="sr"><span class="sn">Authentication & Deployment</span><span class="sl sp">Practiced</span></div>
+  <div class="sr"><span class="sn">Distributed Team Work</span><span class="sl sp">Practiced</span></div>
+  <div class="sr"><span class="sn">Professional Communication</span><span class="sl si">Internalized</span></div>
+  <div class="leg">
+    <div class="li"><div class="lb" style="background:#16a34a"></div>Internalized</div>
+    <div class="li"><div class="lb" style="background:#dbeafe"></div>Practiced</div>
+    <div class="li"><div class="lb" style="background:#fffbeb;border:1px solid #b45309"></div>Exposed</div>
+  </div>
+</div>
+
+<div class="center">
+  <div class="lr">
+    <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.9C15.5 4.9 20 7 20 7s2.1 4.5 .1 10.2A7 7 0 0 1 11 20"/><path d="M10 20.5c2-2.5 3-5 3.5-8.5"/></svg>
+    <div><div class="lt">Bramble</div><div class="ls">Community Foraging App</div></div>
+  </div>
+  <div class="ad">Identify wild plants with AI, keep a personal foraging journal, and share your discoveries on a community map. Built for foragers, hikers, and the naturally curious.</div>
+
+  <div class="phones">
+    <div class="ph"><div class="pf"><div class="pn"><div class="pnb"></div></div><div class="pc" style="background:white"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.9C15.5 4.9 20 7 20 7s2.1 4.5 .1 10.2A7 7 0 0 1 11 20"/><path d="M10 20.5c2-2.5 3-5 3.5-8.5"/></svg><div style="font-size:14pt;font-weight:700;color:#1c1917">Bramble</div><div class="psx">Know what grows around you</div><div class="psb" style="margin-top:8pt">Get Started</div></div></div><div class="pl">Landing</div></div>
+    <div class="ph"><div class="pf"><div class="pn"><div class="pnb"></div></div><div class="pc" style="background:#e8f5e9"><div class="pst">Community Map</div><div class="mpa">&#127758;<div class="mpn" style="top:30px;left:22px;background:#16a34a"></div><div class="mpn" style="top:65px;left:80px;background:#ef4444"></div><div class="mpn" style="top:100px;left:50px;background:#16a34a"></div></div><div class="mnv"><span class="a">Map</span><span>Scan</span><span>Journal</span><span>Plants</span></div></div></div><div class="pl">Map</div></div>
+    <div class="ph"><div class="pf"><div class="pn"><div class="pnb"></div></div><div class="pc" style="background:#f0f9ff"><div class="pst">Scan a Plant</div><div class="sca"><div class="scr">&#128247;</div><div class="psx">Tap to capture</div></div></div></div><div class="pl">Scan</div></div>
+    <div class="ph"><div class="pf"><div class="pn"><div class="pnb"></div></div><div class="pc" style="background:white"><div class="pst">Identified!</div><div class="reb"><div class="ren">Taraxacum officinale</div><div class="rec">Common Dandelion</div><div class="ref">94% confidence</div></div><div class="retg"><span class="ret rete">Edible</span><span class="ret retm">Medicinal</span></div><div class="psb" style="margin-top:6pt">Save to Journal</div></div></div><div class="pl">Results</div></div>
+    <div class="ph"><div class="pf"><div class="pn"><div class="pnb"></div></div><div class="pc" style="background:#fefce8"><div class="pst">My Journal</div><div class="jne">Dandelion - May 26, 2026</div><div class="jne">Wild Garlic - May 25, 2026</div><div class="jne">Pokeweed - May 24, 2026</div><div class="jne">Chicory - May 23, 2026</div></div></div><div class="pl">Journal</div></div>
+  </div>
+
+  <div class="steps">
+    <div class="stp"><div class="stpn">1</div><div class="stpt">Scan</div><div class="stpd">Point your camera at any plant</div></div>
+    <div class="stp"><div class="stpn">2</div><div class="stpt">Identify</div><div class="stpd">AI matches against thousands of species</div></div>
+    <div class="stp"><div class="stpn">3</div><div class="stpt">Learn & Share</div><div class="stpd">Get safety info, save to journal, pin on the map</div></div>
+  </div>
+
+  <div class="cdv"></div>
+
+  <div class="feats">
+    <div class="fc">
+      <div class="fsh">Features</div>
+      <div class="fi"><div class="fid"></div><div><div class="fit">AI Plant Identification</div><div class="fix">Snap a photo and Bramble uses the Pl@ntNet API to identify the species with confidence scoring.</div></div></div>
+      <div class="fi"><div class="fid"></div><div><div class="fit">Safety Information</div><div class="fix">Every plant shows edible, medicinal, toxic, and invasive status. Unverified plants display a clear safety warning.</div></div></div>
+      <div class="fi"><div class="fid"></div><div><div class="fit">Invasive Species Detection</div><div class="fix">Cross-references 1,500+ invasive species from the USGS national registry. Flagged on the map with red markers.</div></div></div>
+      <div class="fi"><div class="fid"></div><div><div class="fit">Community Map</div><div class="fix">Interactive map shows plant discoveries from all users within 25 miles using PostGIS spatial queries.</div></div></div>
+    </div>
+    <div class="fc">
+      <div class="fsh">&nbsp;</div>
+      <div class="fi"><div class="fid"></div><div><div class="fit">Foraging Journal</div><div class="fix">Every scan auto-creates an entry with species, GPS coordinates, date, and confidence score. Add personal notes.</div></div></div>
+      <div class="fi"><div class="fid"></div><div><div class="fit">Plant Database</div><div class="fix">Search 34,000+ species from the USDA database. Filter by edible, medicinal, toxic, or invasive.</div></div></div>
+      <div class="fi"><div class="fid"></div><div><div class="fit">Secure Authentication</div><div class="fix">One-click Google sign-in via Supabase. No passwords to remember.</div></div></div>
+      <div class="fi"><div class="fid"></div><div><div class="fit">3 Authoritative Data Sources</div><div class="fix">Pl@ntNet API (real-time ID), USDA PLANTS (34k species), USGS US-RIIS (invasive registry).</div></div></div>
+    </div>
+  </div>
+
+  <div class="tbar">
+    <div><div class="tbl">Tech Stack</div><div class="tbv">Next.js 16 / React 19 / TypeScript / Tailwind CSS / Supabase + PostGIS / Drizzle ORM / Vercel</div></div>
+    <div class="tbc">Noah Madsen<br>Senior Capstone Project, 2026</div>
+  </div>
+</div>
+
+<div class="right">
+  <div class="pt">What I Learned</div>
+  <div class="ps">Reflections from a 2-week engineering shadow</div>
+  <div class="pb"></div>
+  <div class="les"><div class="leh"><div class="len">1</div><div><div class="leq">"Asking for help is engineering, not weakness."</div><div class="lex">The 20-minute rule: try seriously for 20 minutes, then escalate. Going dark when stuck makes the problem compound while everyone assumes work is happening.</div></div></div></div>
+  <div class="les"><div class="leh"><div class="len">2</div><div><div class="leq">"AI proposes, human curates."</div><div class="lex">AI-assisted coding is a multiplier on what you already understand, not a substitute for understanding. The human judgment layer is where engineers earn their keep.</div></div></div></div>
+  <div class="les"><div class="leh"><div class="len">3</div><div><div class="leq">"Infrastructure is invisible to users."</div><div class="lex">Building the foundation feels productive. But real engineering is shipping end-to-end. Deciding what to cut matters as much as deciding what to build.</div></div></div></div>
+  <div class="les"><div class="leh"><div class="len">4</div><div><div class="leq">"Show me where in MY code this is referenced."</div><div class="lex">When an AI asks for something you don't recognize, ask it to prove the requirement by reading the actual code.</div></div></div></div>
+  <div class="les"><div class="leh"><div class="len">5</div><div><div class="leq">"Match your tools to the shape of the work."</div><div class="lex">Cycles for ongoing teams. Milestones for projects with an end date. Default settings aren't always correct.</div></div></div></div>
+  <div class="les"><div class="leh"><div class="len">6</div><div><div class="leq">"The next engineer should run it without asking a single question."</div><div class="lex">If a machine-specific requirement exists, document it. That's the difference between code and a product.</div></div></div></div>
+  <div class="tak">
+    <div class="sh">The Biggest Takeaway</div>
+    <div class="takb"><div class="takt">"Senior engineers don't ship perfect code. They ship code, then iterate. The skill I needed most wasn't coding - it was saying 'I'm stuck, here's what I tried, can you help?'"</div></div>
+  </div>
+  <div class="qrs">
+    <div class="qrt">Try It Live</div>
+    <div class="qrc"><svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 200 200">
+  <rect x="0" y="0" width="200" height="200" style="fill:#ffffff;shape-rendering:crispEdges;"/>
+  <path x="0" y="0" style="fill:#1c1917;shape-rendering:crispEdges;" d="M13.79,13.79 V20.69 H20.69 V13.79 H13.79 Z M20.69,13.79 V20.69 H27.59 V13.79 H20.69 Z M27.59,13.79 V20.69 H34.48 V13.79 H27.59 Z M34.48,13.79 V20.69 H41.38 V13.79 H34.48 Z M41.38,13.79 V20.69 H48.28 V13.79 H41.38 Z M48.28,13.79 V20.69 H55.17 V13.79 H48.28 Z M55.17,13.79 V20.69 H62.07 V13.79 H55.17 Z M68.97,13.79 V20.69 H75.86 V13.79 H68.97 Z M82.76,13.79 V20.69 H89.66 V13.79 H82.76 Z M89.66,13.79 V20.69 H96.55 V13.79 H89.66 Z M103.45,13.79 V20.69 H110.34 V13.79 H103.45 Z M110.34,13.79 V20.69 H117.24 V13.79 H110.34 Z M117.24,13.79 V20.69 H124.14 V13.79 H117.24 Z M124.14,13.79 V20.69 H131.03 V13.79 H124.14 Z M137.93,13.79 V20.69 H144.83 V13.79 H137.93 Z M144.83,13.79 V20.69 H151.72 V13.79 H144.83 Z M151.72,13.79 V20.69 H158.62 V13.79 H151.72 Z M158.62,13.79 V20.69 H165.52 V13.79 H158.62 Z M165.52,13.79 V20.69 H172.41 V13.79 H165.52 Z M172.41,13.79 V20.69 H179.31 V13.79 H172.41 Z M179.31,13.79 V20.69 H186.21 V13.79 H179.31 Z M13.79,20.69 V27.59 H20.69 V20.69 H13.79 Z M55.17,20.69 V27.59 H62.07 V20.69 H55.17 Z M75.86,20.69 V27.59 H82.76 V20.69 H75.86 Z M96.55,20.69 V27.59 H103.45 V20.69 H96.55 Z M137.93,20.69 V27.59 H144.83 V20.69 H137.93 Z M179.31,20.69 V27.59 H186.21 V20.69 H179.31 Z M13.79,27.59 V34.48 H20.69 V27.59 H13.79 Z M27.59,27.59 V34.48 H34.48 V27.59 H27.59 Z M34.48,27.59 V34.48 H41.38 V27.59 H34.48 Z M41.38,27.59 V34.48 H48.28 V27.59 H41.38 Z M55.17,27.59 V34.48 H62.07 V27.59 H55.17 Z M110.34,27.59 V34.48 H117.24 V27.59 H110.34 Z M117.24,27.59 V34.48 H124.14 V27.59 H117.24 Z M137.93,27.59 V34.48 H144.83 V27.59 H137.93 Z M151.72,27.59 V34.48 H158.62 V27.59 H151.72 Z M158.62,27.59 V34.48 H165.52 V27.59 H158.62 Z M165.52,27.59 V34.48 H172.41 V27.59 H165.52 Z M179.31,27.59 V34.48 H186.21 V27.59 H179.31 Z M13.79,34.48 V41.38 H20.69 V34.48 H13.79 Z M27.59,34.48 V41.38 H34.48 V34.48 H27.59 Z M34.48,34.48 V41.38 H41.38 V34.48 H34.48 Z M41.38,34.48 V41.38 H48.28 V34.48 H41.38 Z M55.17,34.48 V41.38 H62.07 V34.48 H55.17 Z M75.86,34.48 V41.38 H82.76 V34.48 H75.86 Z M82.76,34.48 V41.38 H89.66 V34.48 H82.76 Z M89.66,34.48 V41.38 H96.55 V34.48 H89.66 Z M137.93,34.48 V41.38 H144.83 V34.48 H137.93 Z M151.72,34.48 V41.38 H158.62 V34.48 H151.72 Z M158.62,34.48 V41.38 H165.52 V34.48 H158.62 Z M165.52,34.48 V41.38 H172.41 V34.48 H165.52 Z M179.31,34.48 V41.38 H186.21 V34.48 H179.31 Z M13.79,41.38 V48.28 H20.69 V41.38 H13.79 Z M27.59,41.38 V48.28 H34.48 V41.38 H27.59 Z M34.48,41.38 V48.28 H41.38 V41.38 H34.48 Z M41.38,41.38 V48.28 H48.28 V41.38 H41.38 Z M55.17,41.38 V48.28 H62.07 V41.38 H55.17 Z M75.86,41.38 V48.28 H82.76 V41.38 H75.86 Z M103.45,41.38 V48.28 H110.34 V41.38 H103.45 Z M117.24,41.38 V48.28 H124.14 V41.38 H117.24 Z M137.93,41.38 V48.28 H144.83 V41.38 H137.93 Z M151.72,41.38 V48.28 H158.62 V41.38 H151.72 Z M158.62,41.38 V48.28 H165.52 V41.38 H158.62 Z M165.52,41.38 V48.28 H172.41 V41.38 H165.52 Z M179.31,41.38 V48.28 H186.21 V41.38 H179.31 Z M13.79,48.28 V55.17 H20.69 V48.28 H13.79 Z M55.17,48.28 V55.17 H62.07 V48.28 H55.17 Z M110.34,48.28 V55.17 H117.24 V48.28 H110.34 Z M117.24,48.28 V55.17 H124.14 V48.28 H117.24 Z M124.14,48.28 V55.17 H131.03 V48.28 H124.14 Z M137.93,48.28 V55.17 H144.83 V48.28 H137.93 Z M179.31,48.28 V55.17 H186.21 V48.28 H179.31 Z M13.79,55.17 V62.07 H20.69 V55.17 H13.79 Z M20.69,55.17 V62.07 H27.59 V55.17 H20.69 Z M27.59,55.17 V62.07 H34.48 V55.17 H27.59 Z M34.48,55.17 V62.07 H41.38 V55.17 H34.48 Z M41.38,55.17 V62.07 H48.28 V55.17 H41.38 Z M48.28,55.17 V62.07 H55.17 V55.17 H48.28 Z M55.17,55.17 V62.07 H62.07 V55.17 H55.17 Z M68.97,55.17 V62.07 H75.86 V55.17 H68.97 Z M82.76,55.17 V62.07 H89.66 V55.17 H82.76 Z M96.55,55.17 V62.07 H103.45 V55.17 H96.55 Z M110.34,55.17 V62.07 H117.24 V55.17 H110.34 Z M124.14,55.17 V62.07 H131.03 V55.17 H124.14 Z M137.93,55.17 V62.07 H144.83 V55.17 H137.93 Z M144.83,55.17 V62.07 H151.72 V55.17 H144.83 Z M151.72,55.17 V62.07 H158.62 V55.17 H151.72 Z M158.62,55.17 V62.07 H165.52 V55.17 H158.62 Z M165.52,55.17 V62.07 H172.41 V55.17 H165.52 Z M172.41,55.17 V62.07 H179.31 V55.17 H172.41 Z M179.31,55.17 V62.07 H186.21 V55.17 H179.31 Z M75.86,62.07 V68.97 H82.76 V62.07 H75.86 Z M89.66,62.07 V68.97 H96.55 V62.07 H89.66 Z M110.34,62.07 V68.97 H117.24 V62.07 H110.34 Z M124.14,62.07 V68.97 H131.03 V62.07 H124.14 Z M20.69,68.97 V75.86 H27.59 V68.97 H20.69 Z M27.59,68.97 V75.86 H34.48 V68.97 H27.59 Z M34.48,68.97 V75.86 H41.38 V68.97 H34.48 Z M55.17,68.97 V75.86 H62.07 V68.97 H55.17 Z M62.07,68.97 V75.86 H68.97 V68.97 H62.07 Z M68.97,68.97 V75.86 H75.86 V68.97 H68.97 Z M75.86,68.97 V75.86 H82.76 V68.97 H75.86 Z M82.76,68.97 V75.86 H89.66 V68.97 H82.76 Z M89.66,68.97 V75.86 H96.55 V68.97 H89.66 Z M96.55,68.97 V75.86 H103.45 V68.97 H96.55 Z M103.45,68.97 V75.86 H110.34 V68.97 H103.45 Z M131.03,68.97 V75.86 H137.93 V68.97 H131.03 Z M179.31,68.97 V75.86 H186.21 V68.97 H179.31 Z M13.79,75.86 V82.76 H20.69 V75.86 H13.79 Z M27.59,75.86 V82.76 H34.48 V75.86 H27.59 Z M48.28,75.86 V82.76 H55.17 V75.86 H48.28 Z M62.07,75.86 V82.76 H68.97 V75.86 H62.07 Z M68.97,75.86 V82.76 H75.86 V75.86 H68.97 Z M75.86,75.86 V82.76 H82.76 V75.86 H75.86 Z M96.55,75.86 V82.76 H103.45 V75.86 H96.55 Z M110.34,75.86 V82.76 H117.24 V75.86 H110.34 Z M117.24,75.86 V82.76 H124.14 V75.86 H117.24 Z M124.14,75.86 V82.76 H131.03 V75.86 H124.14 Z M131.03,75.86 V82.76 H137.93 V75.86 H131.03 Z M137.93,75.86 V82.76 H144.83 V75.86 H137.93 Z M144.83,75.86 V82.76 H151.72 V75.86 H144.83 Z M165.52,75.86 V82.76 H172.41 V75.86 H165.52 Z M172.41,75.86 V82.76 H179.31 V75.86 H172.41 Z M13.79,82.76 V89.66 H20.69 V82.76 H13.79 Z M20.69,82.76 V89.66 H27.59 V82.76 H20.69 Z M34.48,82.76 V89.66 H41.38 V82.76 H34.48 Z M41.38,82.76 V89.66 H48.28 V82.76 H41.38 Z M48.28,82.76 V89.66 H55.17 V82.76 H48.28 Z M55.17,82.76 V89.66 H62.07 V82.76 H55.17 Z M62.07,82.76 V89.66 H68.97 V82.76 H62.07 Z M68.97,82.76 V89.66 H75.86 V82.76 H68.97 Z M75.86,82.76 V89.66 H82.76 V82.76 H75.86 Z M82.76,82.76 V89.66 H89.66 V82.76 H82.76 Z M89.66,82.76 V89.66 H96.55 V82.76 H89.66 Z M96.55,82.76 V89.66 H103.45 V82.76 H96.55 Z M110.34,82.76 V89.66 H117.24 V82.76 H110.34 Z M117.24,82.76 V89.66 H124.14 V82.76 H117.24 Z M131.03,82.76 V89.66 H137.93 V82.76 H131.03 Z M137.93,82.76 V89.66 H144.83 V82.76 H137.93 Z M144.83,82.76 V89.66 H151.72 V82.76 H144.83 Z M151.72,82.76 V89.66 H158.62 V82.76 H151.72 Z M158.62,82.76 V89.66 H165.52 V82.76 H158.62 Z M172.41,82.76 V89.66 H179.31 V82.76 H172.41 Z M13.79,89.66 V96.55 H20.69 V89.66 H13.79 Z M34.48,89.66 V96.55 H41.38 V89.66 H34.48 Z M41.38,89.66 V96.55 H48.28 V89.66 H41.38 Z M75.86,89.66 V96.55 H82.76 V89.66 H75.86 Z M144.83,89.66 V96.55 H151.72 V89.66 H144.83 Z M151.72,89.66 V96.55 H158.62 V89.66 H151.72 Z M179.31,89.66 V96.55 H186.21 V89.66 H179.31 Z M13.79,96.55 V103.45 H20.69 V96.55 H13.79 Z M20.69,96.55 V103.45 H27.59 V96.55 H20.69 Z M27.59,96.55 V103.45 H34.48 V96.55 H27.59 Z M55.17,96.55 V103.45 H62.07 V96.55 H55.17 Z M62.07,96.55 V103.45 H68.97 V96.55 H62.07 Z M68.97,96.55 V103.45 H75.86 V96.55 H68.97 Z M75.86,96.55 V103.45 H82.76 V96.55 H75.86 Z M103.45,96.55 V103.45 H110.34 V96.55 H103.45 Z M117.24,96.55 V103.45 H124.14 V96.55 H117.24 Z M124.14,96.55 V103.45 H131.03 V96.55 H124.14 Z M137.93,96.55 V103.45 H144.83 V96.55 H137.93 Z M158.62,96.55 V103.45 H165.52 V96.55 H158.62 Z M172.41,96.55 V103.45 H179.31 V96.55 H172.41 Z M179.31,96.55 V103.45 H186.21 V96.55 H179.31 Z M13.79,103.45 V110.34 H20.69 V103.45 H13.79 Z M34.48,103.45 V110.34 H41.38 V103.45 H34.48 Z M41.38,103.45 V110.34 H48.28 V103.45 H41.38 Z M48.28,103.45 V110.34 H55.17 V103.45 H48.28 Z M68.97,103.45 V110.34 H75.86 V103.45 H68.97 Z M82.76,103.45 V110.34 H89.66 V103.45 H82.76 Z M103.45,103.45 V110.34 H110.34 V103.45 H103.45 Z M110.34,103.45 V110.34 H117.24 V103.45 H110.34 Z M124.14,103.45 V110.34 H131.03 V103.45 H124.14 Z M131.03,103.45 V110.34 H137.93 V103.45 H131.03 Z M137.93,103.45 V110.34 H144.83 V103.45 H137.93 Z M158.62,103.45 V110.34 H165.52 V103.45 H158.62 Z M165.52,103.45 V110.34 H172.41 V103.45 H165.52 Z M172.41,103.45 V110.34 H179.31 V103.45 H172.41 Z M179.31,103.45 V110.34 H186.21 V103.45 H179.31 Z M34.48,110.34 V117.24 H41.38 V110.34 H34.48 Z M48.28,110.34 V117.24 H55.17 V110.34 H48.28 Z M55.17,110.34 V117.24 H62.07 V110.34 H55.17 Z M68.97,110.34 V117.24 H75.86 V110.34 H68.97 Z M75.86,110.34 V117.24 H82.76 V110.34 H75.86 Z M89.66,110.34 V117.24 H96.55 V110.34 H89.66 Z M110.34,110.34 V117.24 H117.24 V110.34 H110.34 Z M124.14,110.34 V117.24 H131.03 V110.34 H124.14 Z M144.83,110.34 V117.24 H151.72 V110.34 H144.83 Z M158.62,110.34 V117.24 H165.52 V110.34 H158.62 Z M165.52,110.34 V117.24 H172.41 V110.34 H165.52 Z M27.59,117.24 V124.14 H34.48 V117.24 H27.59 Z M75.86,117.24 V124.14 H82.76 V117.24 H75.86 Z M82.76,117.24 V124.14 H89.66 V117.24 H82.76 Z M96.55,117.24 V124.14 H103.45 V117.24 H96.55 Z M103.45,117.24 V124.14 H110.34 V117.24 H103.45 Z M110.34,117.24 V124.14 H117.24 V117.24 H110.34 Z M144.83,117.24 V124.14 H151.72 V117.24 H144.83 Z M151.72,117.24 V124.14 H158.62 V117.24 H151.72 Z M165.52,117.24 V124.14 H172.41 V117.24 H165.52 Z M20.69,124.14 V131.03 H27.59 V124.14 H20.69 Z M34.48,124.14 V131.03 H41.38 V124.14 H34.48 Z M41.38,124.14 V131.03 H48.28 V124.14 H41.38 Z M48.28,124.14 V131.03 H55.17 V124.14 H48.28 Z M55.17,124.14 V131.03 H62.07 V124.14 H55.17 Z M62.07,124.14 V131.03 H68.97 V124.14 H62.07 Z M82.76,124.14 V131.03 H89.66 V124.14 H82.76 Z M89.66,124.14 V131.03 H96.55 V124.14 H89.66 Z M96.55,124.14 V131.03 H103.45 V124.14 H96.55 Z M103.45,124.14 V131.03 H110.34 V124.14 H103.45 Z M124.14,124.14 V131.03 H131.03 V124.14 H124.14 Z M131.03,124.14 V131.03 H137.93 V124.14 H131.03 Z M137.93,124.14 V131.03 H144.83 V124.14 H137.93 Z M144.83,124.14 V131.03 H151.72 V124.14 H144.83 Z M151.72,124.14 V131.03 H158.62 V124.14 H151.72 Z M172.41,124.14 V131.03 H179.31 V124.14 H172.41 Z M179.31,124.14 V131.03 H186.21 V124.14 H179.31 Z M68.97,131.03 V137.93 H75.86 V131.03 H68.97 Z M75.86,131.03 V137.93 H82.76 V131.03 H75.86 Z M117.24,131.03 V137.93 H124.14 V131.03 H117.24 Z M124.14,131.03 V137.93 H131.03 V131.03 H124.14 Z M151.72,131.03 V137.93 H158.62 V131.03 H151.72 Z M158.62,131.03 V137.93 H165.52 V131.03 H158.62 Z M172.41,131.03 V137.93 H179.31 V131.03 H172.41 Z M13.79,137.93 V144.83 H20.69 V137.93 H13.79 Z M20.69,137.93 V144.83 H27.59 V137.93 H20.69 Z M27.59,137.93 V144.83 H34.48 V137.93 H27.59 Z M34.48,137.93 V144.83 H41.38 V137.93 H34.48 Z M41.38,137.93 V144.83 H48.28 V137.93 H41.38 Z M48.28,137.93 V144.83 H55.17 V137.93 H48.28 Z M55.17,137.93 V144.83 H62.07 V137.93 H55.17 Z M68.97,137.93 V144.83 H75.86 V137.93 H68.97 Z M82.76,137.93 V144.83 H89.66 V137.93 H82.76 Z M96.55,137.93 V144.83 H103.45 V137.93 H96.55 Z M110.34,137.93 V144.83 H117.24 V137.93 H110.34 Z M117.24,137.93 V144.83 H124.14 V137.93 H117.24 Z M124.14,137.93 V144.83 H131.03 V137.93 H124.14 Z M137.93,137.93 V144.83 H144.83 V137.93 H137.93 Z M151.72,137.93 V144.83 H158.62 V137.93 H151.72 Z M158.62,137.93 V144.83 H165.52 V137.93 H158.62 Z M179.31,137.93 V144.83 H186.21 V137.93 H179.31 Z M13.79,144.83 V151.72 H20.69 V144.83 H13.79 Z M55.17,144.83 V151.72 H62.07 V144.83 H55.17 Z M75.86,144.83 V151.72 H82.76 V144.83 H75.86 Z M96.55,144.83 V151.72 H103.45 V144.83 H96.55 Z M103.45,144.83 V151.72 H110.34 V144.83 H103.45 Z M110.34,144.83 V151.72 H117.24 V144.83 H110.34 Z M117.24,144.83 V151.72 H124.14 V144.83 H117.24 Z M124.14,144.83 V151.72 H131.03 V144.83 H124.14 Z M151.72,144.83 V151.72 H158.62 V144.83 H151.72 Z M172.41,144.83 V151.72 H179.31 V144.83 H172.41 Z M13.79,151.72 V158.62 H20.69 V151.72 H13.79 Z M27.59,151.72 V158.62 H34.48 V151.72 H27.59 Z M34.48,151.72 V158.62 H41.38 V151.72 H34.48 Z M41.38,151.72 V158.62 H48.28 V151.72 H41.38 Z M55.17,151.72 V158.62 H62.07 V151.72 H55.17 Z M75.86,151.72 V158.62 H82.76 V151.72 H75.86 Z M82.76,151.72 V158.62 H89.66 V151.72 H82.76 Z M110.34,151.72 V158.62 H117.24 V151.72 H110.34 Z M124.14,151.72 V158.62 H131.03 V151.72 H124.14 Z M131.03,151.72 V158.62 H137.93 V151.72 H131.03 Z M137.93,151.72 V158.62 H144.83 V151.72 H137.93 Z M144.83,151.72 V158.62 H151.72 V151.72 H144.83 Z M151.72,151.72 V158.62 H158.62 V151.72 H151.72 Z M172.41,151.72 V158.62 H179.31 V151.72 H172.41 Z M13.79,158.62 V165.52 H20.69 V158.62 H13.79 Z M27.59,158.62 V165.52 H34.48 V158.62 H27.59 Z M34.48,158.62 V165.52 H41.38 V158.62 H34.48 Z M41.38,158.62 V165.52 H48.28 V158.62 H41.38 Z M55.17,158.62 V165.52 H62.07 V158.62 H55.17 Z M68.97,158.62 V165.52 H75.86 V158.62 H68.97 Z M75.86,158.62 V165.52 H82.76 V158.62 H75.86 Z M82.76,158.62 V165.52 H89.66 V158.62 H82.76 Z M89.66,158.62 V165.52 H96.55 V158.62 H89.66 Z M110.34,158.62 V165.52 H117.24 V158.62 H110.34 Z M117.24,158.62 V165.52 H124.14 V158.62 H117.24 Z M165.52,158.62 V165.52 H172.41 V158.62 H165.52 Z M179.31,158.62 V165.52 H186.21 V158.62 H179.31 Z M13.79,165.52 V172.41 H20.69 V165.52 H13.79 Z M27.59,165.52 V172.41 H34.48 V165.52 H27.59 Z M34.48,165.52 V172.41 H41.38 V165.52 H34.48 Z M41.38,165.52 V172.41 H48.28 V165.52 H41.38 Z M55.17,165.52 V172.41 H62.07 V165.52 H55.17 Z M68.97,165.52 V172.41 H75.86 V165.52 H68.97 Z M75.86,165.52 V172.41 H82.76 V165.52 H75.86 Z M117.24,165.52 V172.41 H124.14 V165.52 H117.24 Z M124.14,165.52 V172.41 H131.03 V165.52 H124.14 Z M151.72,165.52 V172.41 H158.62 V165.52 H151.72 Z M165.52,165.52 V172.41 H172.41 V165.52 H165.52 Z M13.79,172.41 V179.31 H20.69 V172.41 H13.79 Z M55.17,172.41 V179.31 H62.07 V172.41 H55.17 Z M68.97,172.41 V179.31 H75.86 V172.41 H68.97 Z M75.86,172.41 V179.31 H82.76 V172.41 H75.86 Z M82.76,172.41 V179.31 H89.66 V172.41 H82.76 Z M103.45,172.41 V179.31 H110.34 V172.41 H103.45 Z M110.34,172.41 V179.31 H117.24 V172.41 H110.34 Z M151.72,172.41 V179.31 H158.62 V172.41 H151.72 Z M158.62,172.41 V179.31 H165.52 V172.41 H158.62 Z M13.79,179.31 V186.21 H20.69 V179.31 H13.79 Z M20.69,179.31 V186.21 H27.59 V179.31 H20.69 Z M27.59,179.31 V186.21 H34.48 V179.31 H27.59 Z M34.48,179.31 V186.21 H41.38 V179.31 H34.48 Z M41.38,179.31 V186.21 H48.28 V179.31 H41.38 Z M48.28,179.31 V186.21 H55.17 V179.31 H48.28 Z M55.17,179.31 V186.21 H62.07 V179.31 H55.17 Z M82.76,179.31 V186.21 H89.66 V179.31 H82.76 Z M89.66,179.31 V186.21 H96.55 V179.31 H89.66 Z M96.55,179.31 V186.21 H103.45 V179.31 H96.55 Z M110.34,179.31 V186.21 H117.24 V179.31 H110.34 Z M117.24,179.31 V186.21 H124.14 V179.31 H117.24 Z M137.93,179.31 V186.21 H144.83 V179.31 H137.93 Z M151.72,179.31 V186.21 H158.62 V179.31 H151.72 Z M158.62,179.31 V186.21 H165.52 V179.31 H158.62 Z M165.52,179.31 V186.21 H172.41 V179.31 H165.52 Z M172.41,179.31 V186.21 H179.31 V179.31 H172.41 Z M179.31,179.31 V186.21 H186.21 V179.31 H179.31 Z " /></svg></div>
+    <div class="qru">bramblemap.com</div>
+  </div>
+</div>
+
+</body>
+</html>

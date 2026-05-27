@@ -1,8 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import postgres from "postgres";
-
-const sql = postgres(process.env.DATABASE_URL!);
+import { sql } from "@/db";
 
 // Community pins are only visible to authenticated users
 export async function GET(request: Request) {
@@ -32,6 +30,7 @@ export async function GET(request: Request) {
         cp.id,
         cp.species_name,
         cp.pinned_at,
+        cp.shared_notes,
         ST_Y(cp.location::geometry) as latitude,
         ST_X(cp.location::geometry) as longitude,
         p.common_name,
@@ -42,7 +41,11 @@ export async function GET(request: Request) {
         p.invasive,
         p.safety_notes,
         p.image_url,
-        u.display_name as user_display_name
+        CASE
+          WHEN u.display_preference = 'real_name' THEN u.display_name
+          WHEN u.display_preference = 'username' THEN u.username
+          ELSE NULL
+        END as user_display_name
       FROM community_pins cp
       LEFT JOIN plants p ON cp.plant_id = p.id
       LEFT JOIN users u ON cp.user_id = u.id

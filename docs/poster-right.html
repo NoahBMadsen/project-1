@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Bramble Poster - Right Panel (12" x 36")</title>
+<style>
+  @page { size: 12in 36in; margin: 0; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { width: 12in; height: 36in; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: #fafaf8; color: #1c1917; overflow: hidden; }
+  .panel { width: 12in; height: 36in; padding: 0.6in 0.5in; display: flex; flex-direction: column; }
+
+  .panel-title { font-size: 32pt; font-weight: 800; color: #14532d; text-transform: uppercase; letter-spacing: 3px; }
+  .panel-subtitle { font-size: 13pt; color: #78716c; margin-top: 4pt; }
+  .title-bar { width: 60px; height: 5px; background: #16a34a; border-radius: 3px; margin-top: 10pt; margin-bottom: 20pt; }
+
+  .lessons { display: flex; flex-direction: column; gap: 14pt; }
+  .lesson { padding: 14pt; background: white; border-radius: 10px; border-left: 4px solid #16a34a; }
+  .lesson-header { display: flex; gap: 10pt; align-items: flex-start; }
+  .lesson-num { width: 28px; height: 28px; border-radius: 50%; background: #dcfce7; display: flex; align-items: center; justify-content: center; font-size: 13pt; font-weight: 800; color: #14532d; flex-shrink: 0; }
+  .lesson-quote { font-size: 13pt; font-weight: 700; color: #14532d; font-style: italic; line-height: 1.3; }
+  .lesson-explain { font-size: 11pt; color: #78716c; margin-top: 6pt; line-height: 1.5; }
+
+  .takeaway-section { margin-top: 20pt; border-top: 2px solid #e7e5e4; padding-top: 16pt; }
+  .section-title { font-size: 18pt; font-weight: 700; color: #1c1917; margin-bottom: 10pt; }
+  .takeaway { padding: 16pt; background: #dcfce7; border-radius: 10px; border: 2px solid #16a34a; }
+  .takeaway-text { font-size: 14pt; color: #14532d; line-height: 1.6; font-style: italic; font-weight: 600; }
+
+  .qr-section { margin-top: auto; display: flex; flex-direction: column; align-items: center; gap: 10pt; padding: 20pt; background: white; border-radius: 14px; border: 2px solid #e7e5e4; }
+  .qr-title { font-size: 16pt; font-weight: 700; color: #1c1917; }
+  .qr-url { font-size: 22pt; font-weight: 800; color: #16a34a; letter-spacing: 0.5px; }
+  #qr-container { width: 180px; height: 180px; display: flex; align-items: center; justify-content: center; }
+</style>
+</head>
+<body>
+<div class="panel">
+
+  <div class="panel-title">What I Learned</div>
+  <div class="panel-subtitle">Reflections from a 2-week engineering shadow</div>
+  <div class="title-bar"></div>
+
+  <div class="lessons">
+    <div class="lesson">
+      <div class="lesson-header">
+        <div class="lesson-num">1</div>
+        <div>
+          <div class="lesson-quote">"Asking for help is engineering, not weakness."</div>
+          <div class="lesson-explain">The 20-minute rule: try seriously for 20 minutes, then escalate. Going dark when stuck doesn't make the problem go away - it makes it compound while everyone assumes work is happening.</div>
+        </div>
+      </div>
+    </div>
+    <div class="lesson">
+      <div class="lesson-header">
+        <div class="lesson-num">2</div>
+        <div>
+          <div class="lesson-quote">"AI proposes, human curates."</div>
+          <div class="lesson-explain">AI-assisted coding is a multiplier on what you already understand, not a substitute for understanding. The human judgment layer is where engineers earn their keep.</div>
+        </div>
+      </div>
+    </div>
+    <div class="lesson">
+      <div class="lesson-header">
+        <div class="lesson-num">3</div>
+        <div>
+          <div class="lesson-quote">"Infrastructure is invisible to users."</div>
+          <div class="lesson-explain">Building the foundation feels productive because it's tangible. But real engineering is shipping a slice end-to-end. Deciding what to cut matters as much as deciding what to build.</div>
+        </div>
+      </div>
+    </div>
+    <div class="lesson">
+      <div class="lesson-header">
+        <div class="lesson-num">4</div>
+        <div>
+          <div class="lesson-quote">"Show me where in MY code this is referenced."</div>
+          <div class="lesson-explain">When an AI asks for something you don't recognize, don't frantically provide it or dismiss it. Ask the AI to prove the requirement by reading the actual code.</div>
+        </div>
+      </div>
+    </div>
+    <div class="lesson">
+      <div class="lesson-header">
+        <div class="lesson-num">5</div>
+        <div>
+          <div class="lesson-quote">"Match your tools to the shape of the work."</div>
+          <div class="lesson-explain">Cycles are for ongoing teams. Milestones are for projects with an end date. Default settings aren't always correct for your situation.</div>
+        </div>
+      </div>
+    </div>
+    <div class="lesson">
+      <div class="lesson-header">
+        <div class="lesson-num">6</div>
+        <div>
+          <div class="lesson-quote">"The next engineer should be able to run it without asking you a single question."</div>
+          <div class="lesson-explain">If a machine-specific thing is required to run your project, that requirement needs to be documented. That's the difference between code and a product.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="takeaway-section">
+    <div class="section-title">The Biggest Takeaway</div>
+    <div class="takeaway">
+      <div class="takeaway-text">"Senior engineers don't ship perfect code. They ship code, then iterate. The skill I needed most wasn't coding - it was saying 'I'm stuck, here's what I tried, can you help?'"</div>
+    </div>
+  </div>
+
+  <div class="qr-section">
+    <div class="qr-title">Try It Live</div>
+    <div id="qr-container"></div>
+    <div class="qr-url">bramblemap.com</div>
+  </div>
+
+</div>
+
+<script type="module">
+import QRCode from 'https://cdn.jsdelivr.net/npm/@pjaudiomv/qrcode-svg/dist/qrcode.js';
+const qr = new QRCode({
+  content: 'https://bramblemap.com',
+  width: 180,
+  height: 180,
+  padding: 2,
+  color: '#1c1917',
+  background: '#ffffff',
+  ecl: 'M',
+  join: true,
+  container: 'svg-viewbox',
+});
+document.getElementById('qr-container').innerHTML = qr.svg();
+</script>
+</body>
+</html>

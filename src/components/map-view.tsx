@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { MapContainer, TileLayer, Marker, Popup, Circle, useMap } from "react-leaflet";
+import MarkerClusterGroup from "react-leaflet-cluster";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { useLocation } from "@/components/location-provider";
@@ -55,6 +56,7 @@ interface Pin {
   invasive: boolean;
   safety_notes: string | null;
   image_url: string | null;
+  shared_notes: string | null;
   user_display_name: string | null;
 }
 
@@ -89,12 +91,14 @@ function LocationTracker({
 const RADIUS_OPTIONS = [5, 10, 25, 50, 100];
 
 export function MapView() {
-  const { lat: ctxLat, lng: ctxLng, radiusMiles, setLocation, setRadiusMiles } = useLocation();
-  const [pins, setPins] = useState<Pin[]>([]);
+  const { lat: ctxLat, lng: ctxLng, radiusMiles, setLocation, setRadiusMiles, prefetchPlants, prefetchJournal, cachedPins, setCachedPins } = useLocation();
+  const [pins, setPins] = useState<Pin[]>((cachedPins as Pin[]) ?? []);
   const [userLat, setUserLat] = useState<number | null>(ctxLat);
   const [userLng, setUserLng] = useState<number | null>(ctxLng);
   const hasLocationFromCtx = ctxLat != null && ctxLng != null;
+  const hasCachedPins = cachedPins != null && cachedPins.length > 0;
   const [loading, setLoading] = useState(!hasLocationFromCtx);
+  const [loadingPins, setLoadingPins] = useState(false);
   const [locationDenied, setLocationDenied] = useState(false);
 
   useEffect(() => {
@@ -115,17 +119,35 @@ export function MapView() {
     setLoading(false);
   }, []);
 
+  const prefetchTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   useEffect(() => {
     if (userLat == null || userLng == null) return;
 
+    if (!hasCachedPins) setLoadingPins(true);
     fetch(`/api/pins?lat=${userLat}&lng=${userLng}&radius=${radiusMiles}`)
       .then((res) => res.json())
       .then((data) => {
-        setPins(data.pins ?? []);
-        setLoading(false);
+        const freshPins = data.pins ?? [];
+        setPins(freshPins);
+        setCachedPins(freshPins);
       })
-      .catch(() => setLoading(false));
-  }, [userLat, userLng, radiusMiles]);
+      .catch(() => {})
+      .finally(() => {
+        setLoading(false);
+        setLoadingPins(false);
+      });
+
+    if (prefetchTimer.current) clearTimeout(prefetchTimer.current);
+    prefetchTimer.current = setTimeout(() => {
+      prefetchPlants(userLat, userLng, radiusMiles);
+      prefetchJournal();
+    }, 500);
+
+    return () => {
+      if (prefetchTimer.current) clearTimeout(prefetchTimer.current);
+    };
+  }, [userLat, userLng, radiusMiles, prefetchPlants]);
 
   return (
     <div className="relative h-full w-full">
@@ -142,6 +164,12 @@ export function MapView() {
           Enable location access to see nearby plant pins.
         </div>
       )}
+      {!loading && loadingPins && (
+        <div className="absolute inset-x-0 top-0 z-[1000] flex items-center justify-center gap-2 bg-white/90 px-4 py-2 shadow-sm backdrop-blur-sm">
+          <div className="size-4 animate-spin rounded-full border-2 border-emerald-200 border-t-emerald-600" />
+          <span className="text-xs font-medium text-stone-500">Loading nearby plants...</span>
+        </div>
+      )}
       <MapContainer
         center={[39.8283, -98.5795]}
         zoom={4}
@@ -154,10 +182,88 @@ export function MapView() {
         />
         <LocationTracker onLocationFound={handleLocationFound} onLocationError={handleLocationError} />
 
+        <MarkerClusterGroup
+          chunkedLoading
+          spiderfyOnMaxZoom
+          showCoverageOnHover={false}
+          maxClusterRadius={40}
+          iconCreateFunction={(cluster: L.MarkerCluster) => {
+            const count = cluster.getChildCount();
+            const size = count < 10 ? 36 : count < 50 ? 44 : 52;
+            return L.divIcon({
+              className: "",
+              html: `<div style="width:${size}px;height:${size}px;border-radius:50%;background:#16a34a;border:3px solid white;box-shadow:0 2px 8px rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center"><span style="color:white;font-weight:700;font-size:${count < 10 ? 13 : 12}px">${count}</span></div>`,
+              iconSize: L.point(size, size),
+              iconAnchor: L.point(size / 2, size / 2),
+            });
+          }}
+        >
+          {pins.map((pin) => (
+            <Marker
+              key={pin.id}
+              position={[pin.latitude, pin.longitude]}
+              icon={plantPinIcon(pin.image_url, pin.invasive)}
+            >
+              <Popup>
+                <div className="min-w-[200px]">
+                  <p className="text-base font-semibold">
+                    {pin.common_name ?? pin.species_name}
+                  </p>
+                  {pin.scientific_name && (
+                    <p className="text-xs italic text-gray-500">
+                      {pin.scientific_name}
+                    </p>
+                  )}
+                  <div className="mt-2 flex flex-wrap gap-1">
+                    {pin.edible && (
+                      <span className="rounded bg-green-100 px-1.5 py-0.5 text-xs text-green-700">
+                        Edible
+                      </span>
+                    )}
+                    {pin.medicinal && (
+                      <span className="rounded bg-blue-100 px-1.5 py-0.5 text-xs text-blue-700">
+                        Medicinal
+                      </span>
+                    )}
+                    {pin.toxic && (
+                      <span className="rounded bg-red-100 px-1.5 py-0.5 text-xs text-red-700">
+                        Toxic
+                      </span>
+                    )}
+                    {pin.invasive && (
+                      <span className="rounded bg-orange-100 px-1.5 py-0.5 text-xs text-orange-700">
+                        Invasive
+                      </span>
+                    )}
+                  </div>
+                  {pin.shared_notes && (
+                    <p className="mt-2 text-sm text-gray-600 italic">
+                      &ldquo;{pin.shared_notes}&rdquo;
+                    </p>
+                  )}
+                  <p className="mt-2 text-xs text-gray-400">
+                    {pin.user_display_name
+                      ? `Spotted by ${pin.user_display_name}`
+                      : "Anonymous forager"}
+                    {" · "}
+                    {new Date(pin.pinned_at).toLocaleDateString()}
+                  </p>
+                </div>
+              </Popup>
+            </Marker>
+          ))}
+        </MarkerClusterGroup>
+
         {userLat != null && userLng != null && (
           <>
+            <Circle
+              center={[userLat, userLng]}
+              radius={radiusMiles * 1609.34}
+              pathOptions={{ color: "#16a34a", fillColor: "#16a34a", fillOpacity: 0.05, weight: 1.5, dashArray: "6 4" }}
+            />
             <Marker
               position={[userLat, userLng]}
+              zIndexOffset={1000}
               icon={L.divIcon({
                 className: "user-location-marker",
                 html: '<div style="width:16px;height:16px;background:#3b82f6;border:3px solid white;border-radius:50%;box-shadow:0 0 6px rgba(59,130,246,0.5)"></div>',
@@ -167,64 +273,8 @@ export function MapView() {
             >
               <Popup>You are here</Popup>
             </Marker>
-            <Circle
-              center={[userLat, userLng]}
-              radius={radiusMiles * 1609.34}
-              pathOptions={{ color: "#16a34a", fillColor: "#16a34a", fillOpacity: 0.05, weight: 1.5, dashArray: "6 4" }}
-            />
           </>
         )}
-
-        {pins.map((pin) => (
-          <Marker
-            key={pin.id}
-            position={[pin.latitude, pin.longitude]}
-            icon={plantPinIcon(pin.image_url, pin.invasive)}
-          >
-            <Popup>
-              <div className="min-w-[200px]">
-                <p className="text-base font-semibold">
-                  {pin.common_name ?? pin.species_name}
-                </p>
-                {pin.scientific_name && (
-                  <p className="text-xs italic text-gray-500">
-                    {pin.scientific_name}
-                  </p>
-                )}
-                <div className="mt-2 flex flex-wrap gap-1">
-                  {pin.edible && (
-                    <span className="rounded bg-green-100 px-1.5 py-0.5 text-xs text-green-700">
-                      Edible
-                    </span>
-                  )}
-                  {pin.medicinal && (
-                    <span className="rounded bg-blue-100 px-1.5 py-0.5 text-xs text-blue-700">
-                      Medicinal
-                    </span>
-                  )}
-                  {pin.toxic && (
-                    <span className="rounded bg-red-100 px-1.5 py-0.5 text-xs text-red-700">
-                      Toxic
-                    </span>
-                  )}
-                  {pin.invasive && (
-                    <span className="rounded bg-orange-100 px-1.5 py-0.5 text-xs text-orange-700">
-                      Invasive
-                    </span>
-                  )}
-                </div>
-                {pin.user_display_name && (
-                  <p className="mt-2 text-xs text-gray-400">
-                    Spotted by {pin.user_display_name}
-                  </p>
-                )}
-                <p className="text-xs text-gray-400">
-                  {new Date(pin.pinned_at).toLocaleDateString()}
-                </p>
-              </div>
-            </Popup>
-          </Marker>
-        ))}
       </MapContainer>
       <div className="absolute bottom-4 left-4 z-[1000] flex items-center gap-1.5 rounded-xl bg-white/95 px-3 py-2 shadow-lg backdrop-blur-sm">
         <span className="text-xs font-medium text-stone-500">Radius:</span>
