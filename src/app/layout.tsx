@@ -16,6 +16,13 @@ export const metadata: Metadata = {
   title: "Bramble - Community Foraging App",
   description:
     "Identify wild plants with AI, keep a foraging journal, and share finds on a community map.",
+  metadataBase: new URL("https://bramblemap.com"),
+  openGraph: {
+    title: "Bramble - Community Foraging App",
+    description: "Identify wild plants with AI, keep a foraging journal, and share finds on a community map.",
+    siteName: "Bramble",
+    type: "website",
+  },
 };
 
 export default function RootLayout({
