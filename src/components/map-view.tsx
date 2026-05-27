@@ -160,10 +160,13 @@ export function MapView() {
         </div>
       )}
       {locationDenied && (
-        <div className="absolute inset-x-0 top-0 z-[1000] bg-amber-50 px-4 py-3 text-center text-sm text-amber-800">
-          <p>Location access is needed to show nearby plants.</p>
+        <div className="absolute inset-x-0 top-0 z-[1000] bg-amber-50 px-4 py-4 text-center text-sm text-amber-800">
+          <p className="font-medium">Location access is needed to show nearby plants.</p>
+          <p className="mt-1.5 text-xs text-amber-600">
+            On Mac: System Settings &gt; Privacy &amp; Security &gt; Location Services - make sure it&apos;s on and your browser is allowed.
+          </p>
           <p className="mt-1 text-xs text-amber-600">
-            Check your browser&apos;s address bar for a location icon, or go to Settings &gt; Privacy &gt; Location.
+            On iPhone: Settings &gt; Privacy &gt; Location Services &gt; Safari/Chrome.
           </p>
           <button
             onClick={() => {
@@ -181,7 +184,7 @@ export function MapView() {
                 { enableHighAccuracy: true, timeout: 10000 }
               );
             }}
-            className="mt-2 rounded-lg bg-amber-600 px-4 py-1.5 text-xs font-medium text-white transition hover:bg-amber-700"
+            className="mt-3 rounded-lg bg-amber-600 px-4 py-1.5 text-xs font-medium text-white transition hover:bg-amber-700"
           >
             Try Again
           </button>
