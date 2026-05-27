@@ -187,7 +187,8 @@ export function MapView() {
           spiderfyOnMaxZoom
           showCoverageOnHover={false}
           maxClusterRadius={40}
-          iconCreateFunction={(cluster: L.MarkerCluster) => {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          iconCreateFunction={(cluster: any) => {
             const count = cluster.getChildCount();
             const size = count < 10 ? 36 : count < 50 ? 44 : 52;
             return L.divIcon({
