@@ -151,11 +151,13 @@ export function MapView() {
 
   return (
     <div className="relative h-full w-full">
-      {loading && (
-        <div className="absolute inset-0 z-[1000] flex items-center justify-center bg-stone-50/80">
-          <div className="flex flex-col items-center gap-2">
-            <div className="size-8 animate-spin rounded-full border-4 border-emerald-200 border-t-emerald-600" />
-            <p className="text-sm text-stone-500">Finding your location...</p>
+      {(loading || (loadingPins && pins.length === 0)) && (
+        <div className="absolute inset-x-0 bottom-16 z-[1000] flex justify-center">
+          <div className="flex items-center gap-3 rounded-full bg-black/60 px-5 py-3 shadow-lg backdrop-blur-md">
+            <div className="size-5 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+            <span className="text-sm font-medium text-white">
+              {loading ? "Finding your location..." : "Loading nearby plants..."}
+            </span>
           </div>
         </div>
       )}
@@ -191,9 +193,9 @@ export function MapView() {
         </div>
       )}
       {!loading && loadingPins && (
-        <div className="absolute inset-x-0 top-0 z-[1000] flex items-center justify-center gap-2 bg-white/90 px-4 py-2 shadow-sm backdrop-blur-sm">
-          <div className="size-4 animate-spin rounded-full border-2 border-emerald-200 border-t-emerald-600" />
-          <span className="text-xs font-medium text-stone-500">Loading nearby plants...</span>
+        <div className="absolute inset-x-0 top-0 z-[1000] h-1 overflow-hidden bg-emerald-100">
+          <div className="h-full w-1/3 animate-[shimmer_1s_ease-in-out_infinite] rounded-full bg-emerald-500" style={{ animation: "shimmer 1s ease-in-out infinite" }} />
+          <style>{`@keyframes shimmer { 0% { transform: translateX(-100%); } 100% { transform: translateX(400%); } }`}</style>
         </div>
       )}
       <MapContainer
