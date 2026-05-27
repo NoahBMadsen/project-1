@@ -93,8 +93,16 @@ export function MapView() {
   const [pins, setPins] = useState<Pin[]>([]);
   const [userLat, setUserLat] = useState<number | null>(ctxLat);
   const [userLng, setUserLng] = useState<number | null>(ctxLng);
-  const [loading, setLoading] = useState(true);
+  const hasLocationFromCtx = ctxLat != null && ctxLng != null;
+  const [loading, setLoading] = useState(!hasLocationFromCtx);
   const [locationDenied, setLocationDenied] = useState(false);
+
+  useEffect(() => {
+    if (ctxLat != null && ctxLng != null) {
+      setUserLat(ctxLat);
+      setUserLng(ctxLng);
+    }
+  }, [ctxLat, ctxLng]);
 
   const handleLocationFound = useCallback((lat: number, lng: number) => {
     setUserLat(lat);
