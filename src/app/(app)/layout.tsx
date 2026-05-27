@@ -20,11 +20,15 @@ export default async function AppLayout({
     redirect("/sign-in");
   }
 
-  const rows = await sql`
-    SELECT onboarded_at FROM users WHERE id = ${user.id}
-  `;
-  if (rows.length === 0 || rows[0].onboarded_at == null) {
-    redirect("/welcome");
+  try {
+    const rows = await sql`
+      SELECT onboarded_at FROM users WHERE id = ${user.id}
+    `;
+    if (rows.length === 0 || rows[0].onboarded_at == null) {
+      redirect("/welcome");
+    }
+  } catch {
+    // DB unavailable - skip onboarding check rather than crash the page
   }
 
   const displayName =
