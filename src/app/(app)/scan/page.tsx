@@ -149,6 +149,7 @@ export default function ScanPage() {
           longitude: userLocation?.lng ?? null,
           notes: notes || null,
           shareNotes,
+          photoData: capturedImage,
         }),
       });
 

@@ -99,10 +99,18 @@ export default function JournalPage() {
               key={entry.id}
               className="rounded-2xl border border-stone-200 bg-white p-4"
             >
-              <div className="flex items-start justify-between">
+                <div className="flex items-start gap-3">
+                {entry.photo_url && (
+                  <img
+                    src={entry.photo_url}
+                    alt={entry.species_name ?? "Scan photo"}
+                    className="size-16 shrink-0 rounded-xl object-cover"
+                  />
+                )}
+                <div className="flex flex-1 items-start justify-between">
                 <div>
                   <h3 className="font-semibold text-stone-900">
-                    {entry.plant_common_name ?? entry.species_name}
+                    {entry.species_name ?? entry.plant_common_name}
                   </h3>
                   {entry.plant_scientific_name && (
                     <p className="text-xs italic text-stone-400">
@@ -121,6 +129,7 @@ export default function JournalPage() {
                     {confidence}%
                   </span>
                 )}
+              </div>
               </div>
 
               <div className="mt-2 flex flex-wrap gap-1.5">

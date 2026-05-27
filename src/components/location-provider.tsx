@@ -5,6 +5,7 @@ import { createContext, useContext, useState, useEffect, useRef, useCallback, ty
 export interface CachedJournalEntry {
   id: string;
   species_name: string;
+  photo_url: string | null;
   confidence_score: number | null;
   notes: string | null;
   scanned_at: string;

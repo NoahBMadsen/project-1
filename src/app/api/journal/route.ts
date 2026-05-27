@@ -14,7 +14,7 @@ export async function GET() {
 
   const rows = await sql`
     SELECT
-      je.id, je.user_id, je.plant_id, je.species_name,
+      je.id, je.user_id, je.plant_id, je.species_name, je.photo_url,
       je.confidence_score, je.notes, je.scanned_at,
       ST_Y(je.location::geometry) as latitude,
       ST_X(je.location::geometry) as longitude,
@@ -63,7 +63,26 @@ export async function POST(request: Request) {
     longitude,
     notes,
     shareNotes,
+    photoData,
   } = body;
+
+  let photoUrl: string | null = null;
+  if (photoData && typeof photoData === "string" && photoData.startsWith("data:")) {
+    try {
+      const base64 = photoData.split(",")[1];
+      const buffer = Buffer.from(base64, "base64");
+      const filename = `${user.id}/${Date.now()}.jpg`;
+      const { data: upload } = await supabase.storage
+        .from("user-photos")
+        .upload(filename, buffer, { contentType: "image/jpeg", upsert: false });
+      if (upload?.path) {
+        const { data: urlData } = supabase.storage.from("user-photos").getPublicUrl(upload.path);
+        photoUrl = urlData?.publicUrl ?? null;
+      }
+    } catch {
+      // Photo upload failed - continue without it
+    }
+  }
 
   const locationValue =
     latitude != null && longitude != null
@@ -71,14 +90,15 @@ export async function POST(request: Request) {
       : null;
 
   const entryRows = await sql`
-    INSERT INTO journal_entries (user_id, plant_id, species_name, confidence_score, location, notes)
+    INSERT INTO journal_entries (user_id, plant_id, species_name, confidence_score, location, notes, photo_url)
     VALUES (
       ${user.id},
       ${plantId ?? null},
       ${speciesName ?? null},
       ${confidenceScore ?? null},
       ${locationValue ? sql`ST_GeogFromText(${locationValue})` : null},
-      ${notes ?? null}
+      ${notes ?? null},
+      ${photoUrl}
     )
     RETURNING *
   `;
