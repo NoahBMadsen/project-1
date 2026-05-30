@@ -13,7 +13,13 @@ const PIN_SIZE = 38;
 const PIN_BORDER = 3;
 const PIN_INNER = PIN_SIZE - PIN_BORDER * 2;
 
+const iconCache = new Map<string, L.DivIcon>();
+
 function plantPinIcon(imageUrl: string | null, invasive: boolean): L.DivIcon {
+  const cacheKey = `${imageUrl ?? ""}|${invasive}`;
+  const cached = iconCache.get(cacheKey);
+  if (cached) return cached;
+
   const border = invasive ? "#f97316" : "#16a34a";
 
   let inner: string;
@@ -23,13 +29,16 @@ function plantPinIcon(imageUrl: string | null, invasive: boolean): L.DivIcon {
     inner = LEAF_SVG;
   }
 
-  return L.divIcon({
+  const icon = L.divIcon({
     className: "",
     html: `<div style="width:${PIN_SIZE}px;height:${PIN_SIZE}px;border-radius:50%;border:${PIN_BORDER}px solid ${border};background:${imageUrl ? '#e5e5e5' : border};box-shadow:0 2px 8px rgba(0,0,0,0.3);overflow:hidden;position:relative;text-align:center;line-height:${PIN_INNER}px">${inner}</div>`,
     iconSize: [PIN_SIZE, PIN_SIZE],
     iconAnchor: [PIN_SIZE / 2, PIN_SIZE / 2],
     popupAnchor: [0, -(PIN_SIZE / 2 + 4)],
   });
+
+  iconCache.set(cacheKey, icon);
+  return icon;
 }
 
 const defaultIcon = L.divIcon({
